@@ -8,11 +8,13 @@
   },
   "dependencies": {
     "core-js": "^3.8.3",
+    "element-plus": "^2.7.8",
     "vue": "^3.2.13",
     "vue-class-component": "^8.0.0-0",
     "vue-router": "^4.0.3"
   },
   "devDependencies": {
+    "@types/webpack-env": "^1.18.5",
     "@vue/cli-plugin-babel": "~5.0.0",
     "@vue/cli-plugin-router": "~5.0.0",
     "@vue/cli-plugin-typescript": "~5.0.0",
