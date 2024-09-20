@@ -1,10 +1,10 @@
 <template>
-<div class="page-login">
+	<div class="page-login">
 		<div class="box">
 			<div class="logo">
 				<img src="@/assets/logo.png" alt="Logo" />
 				<div class="name">
-					<span >脚印源设后台管理系统</span>
+					<span>脚印源设后台管理系统</span>
 				</div>
 			</div>
 
@@ -13,105 +13,76 @@
 			<div class="form">
 				<el-form label-position="top" class="form" :disabled="saving">
 					<el-form-item label="用户名">
-						<input
-							v-model="form.username"
-							placeholder="请输入用户名"
-							maxlength="20"
-							type="text"
-							:readonly="readonly"
-							autocomplete="off"
-							@focus="readonly = false"
-						/>
+						<input v-model="form.account" placeholder="请输入用户名" maxlength="20" type="text"
+							:readonly="readonly" autocomplete="off" @focus="readonly = false" />
 					</el-form-item>
 
 					<el-form-item label="密码">
-						<input
-							v-model="form.password"
-							type="password"
-							placeholder="请输入密码"
-							maxlength="20"
-							autocomplete="off"
-						/>
+						<input v-model="form.password" type="password" placeholder="请输入密码" maxlength="20"
+							autocomplete="off" />
 					</el-form-item>
 
-					<!-- <el-form-item label="验证码">
+					<el-form-item label="验证码">
 						<div class="row">
 							<input
-								v-model="form.verifyCode"
+								v-model="form.captcha"
 								placeholder="图片验证码"
 								maxlength="4"
 								@keyup.enter="toLogin"
 							/>
-
-							<pic-captcha
-								:ref="setRefs('picCaptcha')"
-								v-model="form.captchaId"
-								@change="
-									() => {
-										form.verifyCode = '';
-									}
-								"
-							/>
+							<img class="validateCode" :src="validateCode" alt="">
 						</div>
-					</el-form-item> -->
+					</el-form-item>
 
 					<div class="op">
-						<el-button type="primary" :loading="saving" @click="toLogin"
-							>登录</el-button
-						>
+						<el-button type="primary" :loading="saving" @click="toLogin">登录</el-button>
 					</div>
 				</el-form>
 			</div>
 		</div>
-		  <img class="bg" src="@/assets/bg.svg" alt="">
+		<img class="bg" src="@/assets/bg.svg" alt="">
 		<!-- <a href="https://cool-js.com" class="copyright"> Copyright © COOL </a> -->
 	</div>
 </template>
 
 <script lang="ts" setup>
-import { ElMessage } from 'element-plus';
-import { reactive, ref } from 'vue';
-import { useRouter } from 'vue-router';
-const router = useRouter()
-
+import { onMounted, reactive, ref } from 'vue';
+import {valiDateCode } from "@/service/api"
+import {useLogin} from "./hooks"
 // 状态
 const saving = ref(false);
-
 // 避免自动填充
 const readonly = ref(true);
-
 // 表单数据
-const form = reactive({
-	username: window.localStorage.getItem("username") || "",
-	password: "",
-	captchaId: "",
-	verifyCode: ""
-});
+const form = reactive<LOGIN.loginParams>({
+	account: 'admin',
+	password: '111111',
+	codeKey:"",//图片验证码id
+	captcha:"",//图片验证码值
 
+});
+//验证码图片
+let validateCode = ref('')
+//mounted
+onMounted(()=>{
+	getValiDateCode()
+})
+//获取图片验证码
+async function getValiDateCode() {
+	try {
+		const res = await valiDateCode()
+		console.log(res,'图形验证码')
+		const {codeValue,codeKey} = res.data
+		validateCode.value = codeValue
+		form.codeKey = codeKey
+	} catch (error) {
+		console.log(error)
+		throw error
+	}
+}
 // 登录
 async function toLogin() {
-	if (!form.username) {
-		return ElMessage.error("用户名不能为空");
-	}
-
-	if (!form.password) {
-		return ElMessage.error("密码不能为空");
-	}
-
-	if (!form.verifyCode) {
-		return ElMessage.error("图片验证码不能为空");
-	}
-
-	saving.value = true;
-
-	try {
-		// 跳转首页
-		router.push("/");
-	} catch (err: any) {
-		ElMessage.error(err.message);
-	}
-
-	saving.value = false;
+	useLogin(form,saving)
 }
 </script>
 
@@ -240,11 +211,14 @@ $color: #2c3142;
 					align-items: center;
 					width: 100%;
 					position: relative;
-
-					.pic-captcha {
+					.validateCode{
 						position: absolute;
-						right: 0;
-						top: 0;
+						right: 2.5px;
+						top: 2.5px;
+						width: 145px;
+						height: 40px;
+						border-radius: 6px;
+						cursor:pointer;
 					}
 				}
 			}
