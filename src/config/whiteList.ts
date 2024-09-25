@@ -1,0 +1,1 @@
+export const tokenWhiteList = ['/admin/system/index/Login']

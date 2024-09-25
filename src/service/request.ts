@@ -1,10 +1,17 @@
 import axios from "axios";
+import { useUserStore } from "@/store/user";
+import { tokenWhiteList } from "@/config/whiteList";
 const instance = axios.create({
     timeout: 10 * 1000,
 })
+const UserStore = useUserStore()
 /**请求拦截器 */
 instance.interceptors.request.use(config => {
-    // console.log(config)
+    //console.log(config)
+    //如果请求的url不在白名单内需要添加token
+    if (!tokenWhiteList.includes(config.url as string)) {
+        config.headers['token'] = UserStore.token
+    }
     return config
 }, error => {
     return Promise.reject(error)
@@ -12,6 +19,11 @@ instance.interceptors.request.use(config => {
 instance.interceptors.response.use(response => {
     const { data } = response
     console.info('请求成功========>', data, response)
+    const { data: { token } } = data
+    //刷新token
+    if (token) {
+        UserStore.refeshToken(token)
+    }
     return data
 }, error => {
     console.error('响应错误:', error);

@@ -18,8 +18,14 @@ importers:
         specifier: ^3.8.3
         version: 3.37.1
       element-plus:
-        specifier: ^2.7.8
-        version: 2.7.8(vue@3.4.35(typescript@4.5.5))
+        specifier: ^2.8.3
+        version: 2.8.3(vue@3.4.35(typescript@4.5.5))
+      lodash:
+        specifier: ^4.17.21
+        version: 4.17.21
+      pinia:
+        specifier: ^2.2.2
+        version: 2.2.2(typescript@4.5.5)(vue@3.4.35(typescript@4.5.5))
       vue:
         specifier: ^3.2.13
         version: 3.4.35(typescript@4.5.5)
@@ -30,6 +36,9 @@ importers:
         specifier: ^4.0.3
         version: 4.4.2(vue@3.4.35(typescript@4.5.5))
     devDependencies:
+      '@types/lodash':
+        specifier: ^4.17.7
+        version: 4.17.7
       '@types/webpack-env':
         specifier: ^1.18.5
         version: 1.18.5
@@ -1848,8 +1857,8 @@ packages:
   electron-to-chromium@1.5.4:
     resolution: {integrity: sha512-orzA81VqLyIGUEA77YkVA1D+N+nNfl2isJVjjmOyrlxuooZ19ynb+dOlaDTqd/idKRS9lDCSBmtzM+kyCsMnkA==, tarball: https://registry.npmmirror.com/electron-to-chromium/-/electron-to-chromium-1.5.4.tgz}
 
-  element-plus@2.7.8:
-    resolution: {integrity: sha512-h6dx2XihAbQaud0v+6O7Fy0b0G3YNplNVH7QnK3csTcvQd4y4raiyMRQpf9EKbRbTMdNrFsqAZrs9ok9DMcJHg==, tarball: https://registry.npmmirror.com/element-plus/-/element-plus-2.7.8.tgz}
+  element-plus@2.8.3:
+    resolution: {integrity: sha512-BXQOyDf0s7JHyNEV8iaO+iaOzTZPsBXVKMzMI967vLCodUBDLrtiY5vglAn1YEebQcUOEUMhGcttTpIvEkcBjQ==, tarball: https://registry.npmmirror.com/element-plus/-/element-plus-2.8.3.tgz}
     peerDependencies:
       vue: ^3.2.0
 
@@ -2789,6 +2798,18 @@ packages:
   picomatch@2.3.1:
     resolution: {integrity: sha512-JU3teHTNjmE2VCGFzuY8EXzCDVwEqB2a8fsIvwaStHhAWJEeVd1o1QD80CU6+ZdEXXSLbSsuLwJjkCBWqRQUVA==, tarball: https://registry.npmmirror.com/picomatch/-/picomatch-2.3.1.tgz}
     engines: {node: '>=8.6'}
+
+  pinia@2.2.2:
+    resolution: {integrity: sha512-ja2XqFWZC36mupU4z1ZzxeTApV7DOw44cV4dhQ9sGwun+N89v/XP7+j7q6TanS1u1tdbK4r+1BUx7heMaIdagA==, tarball: https://registry.npmmirror.com/pinia/-/pinia-2.2.2.tgz}
+    peerDependencies:
+      '@vue/composition-api': ^1.4.0
+      typescript: '>=4.4.4'
+      vue: ^2.6.14 || ^3.3.0
+    peerDependenciesMeta:
+      '@vue/composition-api':
+        optional: true
+      typescript:
+        optional: true
 
   pkg-dir@4.2.0:
     resolution: {integrity: sha512-HRDzbaKjC+AOWVXxAU/x54COGeIv9eb+6CkDSQoNTt4XyWoIJvuPsXizxu/Fr23EiekbtZwmh1IcIG/l/a10GQ==, tarball: https://registry.npmmirror.com/pkg-dir/-/pkg-dir-4.2.0.tgz}
@@ -5942,7 +5963,7 @@ snapshots:
 
   electron-to-chromium@1.5.4: {}
 
-  element-plus@2.7.8(vue@3.4.35(typescript@4.5.5)):
+  element-plus@2.8.3(vue@3.4.35(typescript@4.5.5)):
     dependencies:
       '@ctrl/tinycolor': 3.6.1
       '@element-plus/icons-vue': 2.3.1(vue@3.4.35(typescript@4.5.5))
@@ -6836,6 +6857,14 @@ snapshots:
   picocolors@1.0.1: {}
 
   picomatch@2.3.1: {}
+
+  pinia@2.2.2(typescript@4.5.5)(vue@3.4.35(typescript@4.5.5)):
+    dependencies:
+      '@vue/devtools-api': 6.6.3
+      vue: 3.4.35(typescript@4.5.5)
+      vue-demi: 0.14.10(vue@3.4.35(typescript@4.5.5))
+    optionalDependencies:
+      typescript: 4.5.5
 
   pkg-dir@4.2.0:
     dependencies:
