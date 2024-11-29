@@ -1,0 +1,1 @@
+export const cardPad = { padding: '8px' }

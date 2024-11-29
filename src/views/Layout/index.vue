@@ -38,7 +38,39 @@
                     ></path>
                   </svg>
                 </el-icon>
+                <span>角色管理</span>
+              </template>
+            </el-menu-item>
+            <el-menu-item index="/system/user">
+              <template #title>
+                <el-icon>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 1024 1024"
+                  >
+                    <path
+                      fill="currentColor"
+                      d="M512 512a192 192 0 1 0 0-384 192 192 0 0 0 0 384m0 64a256 256 0 1 1 0-512 256 256 0 0 1 0 512m320 320v-96a96 96 0 0 0-96-96H288a96 96 0 0 0-96 96v96a32 32 0 1 1-64 0v-96a160 160 0 0 1 160-160h448a160 160 0 0 1 160 160v96a32 32 0 1 1-64 0"
+                    ></path>
+                  </svg>
+                </el-icon>
                 <span>用户管理</span>
+              </template>
+            </el-menu-item>
+            <el-menu-item index="/system/menu">
+              <template #title>
+                <el-icon>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 1024 1024"
+                  >
+                    <path
+                      fill="currentColor"
+                      d="M160 448a32 32 0 0 1-32-32V160.064a32 32 0 0 1 32-32h256a32 32 0 0 1 32 32V416a32 32 0 0 1-32 32zm448 0a32 32 0 0 1-32-32V160.064a32 32 0 0 1 32-32h255.936a32 32 0 0 1 32 32V416a32 32 0 0 1-32 32zM160 896a32 32 0 0 1-32-32V608a32 32 0 0 1 32-32h256a32 32 0 0 1 32 32v256a32 32 0 0 1-32 32zm448 0a32 32 0 0 1-32-32V608a32 32 0 0 1 32-32h255.936a32 32 0 0 1 32 32v256a32 32 0 0 1-32 32z"
+                    ></path>
+                  </svg>
+                </el-icon>
+                <span>菜单管理</span>
               </template>
             </el-menu-item>
           </el-sub-menu>
@@ -46,15 +78,17 @@
       </div>
     </div>
     <div class="content">
-      <div class="content_top">
-        <img
-          @click="collapse"
-          class="control"
-          :src="isCollapse ? open : close"
-          alt=""
-        />
-        <div class="content_top_right"></div>
-      </div>
+      <el-card>
+        <div class="content_top">
+          <img
+            @click="collapse"
+            class="control"
+            :src="isCollapse ? open : close"
+            alt=""
+          />
+          <div class="content_top_right"></div>
+        </div>
+      </el-card>
       <div class="content_btm">
         <router-view></router-view>
       </div>
@@ -68,9 +102,9 @@ import { Setting, Menu as IconMenu, Location } from "@element-plus/icons-vue";
 const open = require("@/assets/open_menu.png");
 const close = require("@/assets/close_menu.png");
 const isCollapse = ref(false);
-const collapse = ()=>{
-  isCollapse.value = !isCollapse.value
-}
+const collapse = () => {
+  isCollapse.value = !isCollapse.value;
+};
 </script>
 
 <style scoped lang="scss">
@@ -89,6 +123,7 @@ $mw: 200px;
   width: 100%;
   height: 100%;
   box-sizing: border-box;
+  background-color: #e0e0e0;
   .content {
     flex: 1;
     // background-color: rebeccapurple;
@@ -97,11 +132,9 @@ $mw: 200px;
     .content_top {
       display: flex;
       .content_top_right {
-        padding: 20px 10px;
         flex: 1;
       }
       .control {
-        padding: 20px 10px;
         width: 25px;
         height: 25px;
         cursor: pointer;
@@ -111,7 +144,7 @@ $mw: 200px;
       }
     }
     .content_btm {
-      padding: 0px 10px;
+      padding-left: 17px;
       // flex: 1;
       box-sizing: border-box;
     }

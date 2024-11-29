@@ -19,10 +19,12 @@ instance.interceptors.request.use(config => {
 instance.interceptors.response.use(response => {
     const { data } = response
     console.info('请求成功========>', data, response)
-    const { data: { token } } = data
-    //刷新token
-    if (token) {
-        UserStore.refeshToken(token)
+    if (data.data) {
+        const { data: { token } } = data
+        //刷新token
+        if (token) {
+            UserStore.refeshToken(token)
+        }
     }
     return data
 }, error => {

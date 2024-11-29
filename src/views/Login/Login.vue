@@ -47,7 +47,7 @@
 
 <script lang="ts" setup>
 import { onMounted, reactive, ref } from 'vue';
-import {valiDateCode } from "@/service/api"
+import {valiDateCode } from "@/service/user"
 import {useLogin} from "./hooks"
 // 状态
 const saving = ref(false);

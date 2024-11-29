@@ -17,6 +17,20 @@ const routes: Array<RouteRecordRaw> = [
           title: '角色管理',
           hidden: false
         },
+      }, {
+        path: "/system/user",
+        component: () => import('@/views/System/sysUser/index.vue'),
+        meta: {
+          title: "用户管理",
+          hidden: false
+        }
+      }, {
+        path: "/system/menu",
+        component: () => import('@/views/System/sysMenu/index.vue'),
+        meta: {
+          title: "菜单管理",
+          hidden: false
+        }
       }
     ]
   }

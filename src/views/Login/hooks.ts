@@ -1,5 +1,5 @@
 import { ElMessage } from 'element-plus';
-import { login } from "@/service/api"
+import { login } from "@/service/user"
 import { useRouter } from "vue-router";
 import { Ref } from 'vue';
 import router from "@/router"
@@ -13,13 +13,16 @@ export async function useLogin(form: LOGIN.loginParams, saving: Ref<boolean>) {
     saving.value = true;
     try {
         const res = await login(form)
-        if (res && res.code === 200) {
+        if (res.message == '操作成功' && res.code === 200) {
             const { data, message } = res
             console.log(data, "data=====>")
             ElMessage.success(message)
             // 跳转首页
             console.log(router, useRouter)
             router.push("/layout");
+        } else {
+            ElMessage.error(res.message);
+
         }
 
     } catch (err: any) {
