@@ -325,7 +325,7 @@ const confirmHandler = async () => {
   } catch (error) {
     console.warn(error, "err");
     ElMessage({
-      type: "info",
+      type: "error",
       message: "网络开小差了",
     });
   }
@@ -360,7 +360,7 @@ const deleteClick = (row: SYSTEM.user) => {
     })
     .catch(() => {
       ElMessage({
-        type: "info",
+        type: "error",
         message: "网络开小差了",
       });
     });
@@ -383,7 +383,7 @@ const assigningRoles = async (row: SYSTEM.user) => {
   } catch (error) {
     console.warn(error);
     ElMessage({
-      type: "info",
+      type: "error",
       message: "网络开小差了",
     });
   }
@@ -414,7 +414,7 @@ const assignRoleConfirmHandler = async () => {
   } catch (error) {
     console.warn(error)
     ElMessage({
-      type: "info",
+      type: "error",
       message: "网络开小差了",
     });
   }

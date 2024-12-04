@@ -199,7 +199,7 @@ const confirmHandler = async () => {
   } catch (error) {
     console.warn(error);
     ElMessage({
-      type: "info",
+      type: "error",
       message: "网络开小差了",
     });
   }
@@ -227,7 +227,7 @@ const deleteClick = (row: SYSTEM.role) => {
     })
     .catch(() => {
       ElMessage({
-        type: "info",
+        type: "error",
         message: "网络开小差了",
       });
     });
@@ -237,7 +237,5 @@ onMounted(() => {
 });
 </script>
 <style scoped lang="scss">
-.content {
-  width: 98%;
-}
+
 </style>

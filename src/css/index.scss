@@ -3,7 +3,7 @@
 }
 
 .conheight {
-    max-height: 439px;
+    max-height: 95%;
     box-sizing: border-box;
     overflow: auto;
 }
@@ -16,4 +16,8 @@
 
 .titStyle {
     font-weight: bolder;
+}
+.content {
+    width: 98%;
+    height: 80%;
 }

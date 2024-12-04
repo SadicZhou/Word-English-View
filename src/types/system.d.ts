@@ -101,4 +101,23 @@ declare namespace SYSTEM {
         userId: number,
         roleIdList: number[]
     }
+    /**
+     * @description 菜单
+     * @param {number | string} id -菜单ID
+     * @param {number} parentId -父节点ID
+     * @param {string} title -菜单标题
+     * @param {string} component -组件名
+     * @param {number} sortValue -排序
+     * @param {number} status -状态(0:禁止,1:正常)
+     * @param {Array}  children -子节点
+     */
+    interface menu {
+        id?: number | string,
+        parentId: number,
+        title: string,
+        component: string,
+        sortValue: number,
+        status: number,
+        children?: menu[]
+    }
 }

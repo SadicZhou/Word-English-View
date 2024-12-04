@@ -77,7 +77,7 @@
         </el-menu>
       </div>
     </div>
-    <div class="content">
+    <div class="layout_content">
       <el-card>
         <div class="content_top">
           <img
@@ -124,11 +124,12 @@ $mw: 200px;
   height: 100%;
   box-sizing: border-box;
   background-color: #e0e0e0;
-  .content {
+  .layout_content {
     flex: 1;
     // background-color: rebeccapurple;
     display: flex;
     flex-direction: column;
+    height: 100%;
     .content_top {
       display: flex;
       .content_top_right {
@@ -147,6 +148,8 @@ $mw: 200px;
       padding-left: 17px;
       // flex: 1;
       box-sizing: border-box;
+      overflow: auto;
+      height: 95%
     }
   }
   .menus {
