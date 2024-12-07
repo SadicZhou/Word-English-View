@@ -30,22 +30,34 @@
       </el-row>
     </el-card>
     <div class="conheight">
-      <el-table :data="tableData" v-bind="{...tableConfig}">
-      <el-table-column prop="id" label="ID" />
-      <el-table-column prop="roleName" label="角色名" />
-      <el-table-column prop="roleCode" label="角色编码" />
-      <el-table-column prop="description" label="备注" />
-      <el-table-column fixed="right" label="操作">
-        <template #default="{ row }">
-          <el-button link type="primary" size="small" @click="updateClick(row)">
-            详情
-          </el-button>
-          <el-button link type="primary" size="small" @click="deleteClick(row)"
-            >删除</el-button
-          >
-        </template>
-      </el-table-column>
-    </el-table>
+      <el-table :data="tableData" v-bind="{ ...tableConfig }">
+        <el-table-column prop="id" label="ID" />
+        <el-table-column prop="roleName" label="角色名" />
+        <el-table-column prop="roleCode" label="角色编码" />
+        <el-table-column prop="description" label="备注" />
+        <el-table-column fixed="right" label="操作">
+          <template #default="{ row }">
+            <el-button
+              link
+              type="primary"
+              size="small"
+              @click="updateClick(row)"
+            >
+              详情
+            </el-button>
+            <el-button
+              link
+              type="primary"
+              size="small"
+              @click="deleteClick(row)"
+              >删除</el-button
+            >
+            <el-button link type="primary" size="small" @click="assignMenu(row)"
+              >分配菜单</el-button
+            >
+          </template>
+        </el-table-column>
+      </el-table>
     </div>
     <div class="page">
       <el-pagination
@@ -63,20 +75,14 @@
     <template #header>
       <div class="titStyle">{{ title }}</div>
     </template>
-    <el-form :model="role" v-bind="{...formConfig}">
-      <el-form-item
-        label="角色名"
-        v-bind="{...formItemConfig}"
-      >
+    <el-form :model="role" v-bind="{ ...formConfig }">
+      <el-form-item label="角色名" v-bind="{ ...formItemConfig }">
         <el-input v-model="role.roleName" autocomplete="off" />
       </el-form-item>
-      <el-form-item
-        label="角色码"
-        v-bind="{...formItemConfig}"
-      >
+      <el-form-item label="角色码" v-bind="{ ...formItemConfig }">
         <el-input v-model="role.roleCode" autocomplete="off" />
       </el-form-item>
-      <el-form-item label="描述"v-bind="{...formItemConfig}">
+      <el-form-item label="描述" v-bind="{ ...formItemConfig }">
         <el-input
           v-model="role.description"
           autocomplete="off"
@@ -92,12 +98,40 @@
       </div>
     </template>
   </el-dialog>
+  <el-dialog v-model="assiginMenuDialog" width="500">
+    <template #header>
+      <div class="titStyle">{{ title }}</div>
+    </template>
+    <el-tree
+      style="max-width: 600px"
+      :data="menuList"
+      :props="defaultProps"
+      node-key="id"
+      :default-checked-keys="roleMenuIds"
+      :default-expand-all="true"
+      @check="handleMenuNodeClick"
+      show-checkbox
+    />
+    <template #footer>
+      <div>
+        <el-button @click="assginMenuCancelHandler">取消</el-button>
+        <el-button type="primary" @click="assginMenuConfirmHandler">
+          确认
+        </el-button>
+      </div>
+    </template>
+  </el-dialog>
 </template>
 
 <script lang="ts" setup>
 import { Search, Plus } from "@element-plus/icons-vue";
 import { onMounted, reactive, ref } from "vue";
-import { deleteRoleById, roleList, saveSysRole, updateSysRole } from "@/service/role";
+import {
+  deleteRoleById,
+  roleList,
+  saveSysRole,
+  updateSysRole,
+} from "@/service/role";
 import { pageNationConfig } from "@/config/pageConfig";
 import { cardPad } from "@/config/cardConfig";
 import { formConfig, formItemConfig } from "@/config/formConfig";
@@ -105,6 +139,7 @@ import { ElMessage } from "element-plus";
 import { ElMessageBox } from "element-plus";
 import { tableConfig } from "@/config/tableConfig";
 import { Code } from "@/config/code";
+import { doAssignMenu, findSysRoleMenuByRoleId } from "@/service/role_menu";
 
 const searchForm = reactive({
   roleName: "",
@@ -119,7 +154,14 @@ let title = ref("");
 let tableData = ref<SYSTEM.role[]>([]);
 let totalNum = ref(0);
 let current = ref(1);
-
+let assiginMenuDialog = ref(false);
+let menuList = ref<SYSTEM.menu[]>([]);
+let roleMenuIds = ref<number[]>([]);
+let assignMenuIdList = ref<{ id: string, isHalf: number }[]>([]);
+const defaultProps = {
+  children: "children",
+  label: "title",
+};
 const getRoleList = async (roleName: string = "") => {
   try {
     const { data } = await roleList({
@@ -151,6 +193,7 @@ const restForm = () => {
   role.description = "";
   role.roleCode = "";
   role.roleName = "";
+  roleMenuIds.value = [];
 };
 const cancelHandler = () => {
   dialogShow.value = false;
@@ -232,10 +275,47 @@ const deleteClick = (row: SYSTEM.role) => {
       });
     });
 };
+const assignMenu = async (row: SYSTEM.role) => {
+  title.value = "分配菜单";
+  role.id = row.id;
+  try {
+    const { data } = await findSysRoleMenuByRoleId({ id: String(row.id) });
+    menuList.value = data.menus;
+    roleMenuIds.value = data.menusIds;
+    console.log(data, roleMenuIds, "当前角色菜单");
+    assiginMenuDialog.value = true;
+  } catch (error) {
+    ElMessage({
+      type: "error",
+      message: "网络开小差了",
+    });
+  }
+};
+const handleMenuNodeClick = (menu: SYSTEM.menu, tree: any) => {
+  assignMenuIdList.value = [].concat(
+    tree.checkedKeys.map((item: number) => {
+      return { id: item, isHalf: 0 };
+    }),
+    tree.halfCheckedKeys.map((item: number) => {
+      return { id: item, isHalf: 1 };
+    })
+  );
+};
+const assginMenuCancelHandler = () => {
+  restForm();
+  assiginMenuDialog.value = false;
+};
+const assginMenuConfirmHandler = async () => {
+  try {
+    const res = await doAssignMenu({
+      roleId: Number(role.id),
+      menuIdList: assignMenuIdList.value,
+    });
+    console.log(res, "菜单分配结果");
+  } catch (error) {}
+};
 onMounted(() => {
   getRoleList();
 });
 </script>
-<style scoped lang="scss">
-
-</style>
+<style scoped lang="scss"></style>

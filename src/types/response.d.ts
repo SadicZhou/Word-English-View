@@ -1,4 +1,5 @@
 declare namespace RES {
+
     /**
     * @description SysRoleUser角色和用户id
     * @param {number} roleId -角色id
@@ -21,6 +22,7 @@ declare namespace RES {
      * @description 接口返回格式
      * @param {string} code -状态码
      * @param {object} data -vo
+     * 
      */
     interface response<T> {
         code: number,

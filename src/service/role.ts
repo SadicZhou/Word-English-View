@@ -10,20 +10,20 @@ export const roleList = (data: SYSTEM.rolePageParams) => {
  * 新增角色
  */
 export const saveSysRole = (data: SYSTEM.role) => {
-    return httpRequst<RES.response<string>>({ method: 'POST', url: `${BASE_URL}/saveSysRole`, data })
+    return httpRequst<string>({ method: 'POST', url: `${BASE_URL}/saveSysRole`, data })
 }
 /**
  * 修改角色
  */
 export const updateSysRole = (data: SYSTEM.role) => {
-    return httpRequst<RES.response<string>>({ method: 'POST', url: `${BASE_URL}/updateSysRole`, data })
+    return httpRequst<string>({ method: 'POST', url: `${BASE_URL}/updateSysRole`, data })
 }
 /**
  * 删除角色
  */
 
 export const deleteRoleById = (data: SYSTEM.deleteParams) => {
-    return httpRequst<RES.response<string>>({ method: 'POST', url: `${BASE_URL}/deleteById`, data })
+    return httpRequst<string>({ method: 'POST', url: `${BASE_URL}/deleteById`, data })
 }
 /**
  * 查询所有角色
