@@ -207,6 +207,7 @@ import { ElMessage, ElMessageBox } from "element-plus";
 import { tableConfig } from "@/config/tableConfig";
 import { findAllRoles } from "@/service/role";
 import { Code } from "@/config/code";
+import { HOOKS } from "@/hooks";
 
 const handleAvatarSuccess = (response: RES.response<string>) => {
   user.avatar = response.data;
@@ -324,10 +325,7 @@ const confirmHandler = async () => {
     }
   } catch (error) {
     console.warn(error, "err");
-    ElMessage({
-      type: "error",
-      message: "网络开小差了",
-    });
+    HOOKS.useError()
   }
 };
 const cancelHandler = () => {
@@ -359,10 +357,7 @@ const deleteClick = (row: SYSTEM.user) => {
       }
     })
     .catch(() => {
-      ElMessage({
-        type: "error",
-        message: "网络开小差了",
-      });
+      HOOKS.useError()
     });
 };
 const assigningRoles = async (row: SYSTEM.user) => {
@@ -382,10 +377,7 @@ const assigningRoles = async (row: SYSTEM.user) => {
     assainRoleDialog.value = true;
   } catch (error) {
     console.warn(error);
-    ElMessage({
-      type: "error",
-      message: "网络开小差了",
-    });
+    HOOKS.useError()
   }
 };
 const assignRoleCancelHandler = () => {
@@ -413,10 +405,7 @@ const assignRoleConfirmHandler = async () => {
     }
   } catch (error) {
     console.warn(error)
-    ElMessage({
-      type: "error",
-      message: "网络开小差了",
-    });
+    HOOKS.useError()
   }
 };
 onMounted(() => {

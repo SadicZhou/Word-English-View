@@ -140,6 +140,7 @@ import { ElMessageBox } from "element-plus";
 import { tableConfig } from "@/config/tableConfig";
 import { Code } from "@/config/code";
 import { doAssignMenu, findSysRoleMenuByRoleId } from "@/service/role_menu";
+import { HOOKS } from "@/hooks";
 
 const searchForm = reactive({
   roleName: "",
@@ -241,10 +242,7 @@ const confirmHandler = async () => {
     }
   } catch (error) {
     console.warn(error);
-    ElMessage({
-      type: "error",
-      message: "网络开小差了",
-    });
+    HOOKS.useError()
   }
 };
 const addClick = () => {
@@ -269,10 +267,7 @@ const deleteClick = (row: SYSTEM.role) => {
       }
     })
     .catch(() => {
-      ElMessage({
-        type: "error",
-        message: "网络开小差了",
-      });
+      HOOKS.useError()
     });
 };
 const assignMenu = async (row: SYSTEM.role) => {
@@ -285,10 +280,7 @@ const assignMenu = async (row: SYSTEM.role) => {
     console.log(data, roleMenuIds, "当前角色菜单");
     assiginMenuDialog.value = true;
   } catch (error) {
-    ElMessage({
-      type: "error",
-      message: "网络开小差了",
-    });
+    HOOKS.useError()
   }
 };
 const handleMenuNodeClick = (menu: SYSTEM.menu, tree: any) => {

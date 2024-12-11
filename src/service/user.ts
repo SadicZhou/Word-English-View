@@ -47,3 +47,9 @@ export const deleteUserById = (data: SYSTEM.deleteParams) => {
 export const doAssign = (data: SYSTEM.doAssignParams) => {
     return httpRequst<RES.response<string>>({ method: 'POST', url: `${BASE_URL_USER}/doAssign`, data })
 }
+/**
+ * 获取动态路由
+ */
+export const dynamicRoue = () => {
+    return httpRequst<SYSTEM.menu[]>({ method: 'GET', url: `/admin/system/index/menus` })
+}

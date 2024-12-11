@@ -113,11 +113,11 @@ declare namespace SYSTEM {
      */
     interface menu {
         id?: number | string,
-        parentId: number,
+        parentId?: number,
         title: string,
         component: string,
-        sortValue: number,
-        status: number,
+        sortValue?: number,
+        status?: number,
         children?: menu[]
     }
 }

@@ -102,6 +102,7 @@ import { ElMessageBox } from "element-plus";
 import { tableConfig } from "@/config/tableConfig";
 import { Code } from "@/config/code";
 import { menuList } from "@/service/menu";
+import { HOOKS } from "@/hooks";
 
 let dialogShow = ref(false);
 const menu = reactive<SYSTEM.menu>({
@@ -189,10 +190,7 @@ const confirmHandler = async () => {
     }
   } catch (error) {
     console.warn(error);
-    ElMessage({
-      type: "error",
-      message: "网络开小差了",
-    });
+    HOOKS.useError()
   }
 };
 const addClick = () => {
