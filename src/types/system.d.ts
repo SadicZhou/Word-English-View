@@ -103,6 +103,7 @@ declare namespace SYSTEM {
     }
     /**
      * @description 菜单
+     * @param {string} path -菜单地址
      * @param {number | string} id -菜单ID
      * @param {number} parentId -父节点ID
      * @param {string} title -菜单标题
@@ -112,6 +113,7 @@ declare namespace SYSTEM {
      * @param {Array}  children -子节点
      */
     interface menu {
+        path: string
         id?: number | string,
         parentId?: number,
         title: string,

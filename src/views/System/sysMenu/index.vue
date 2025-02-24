@@ -12,7 +12,8 @@
     <div class="conheight">
       <el-table :data="tableData" v-bind="{ ...tableConfig }" row-key="id">
         <el-table-column prop="title" label="菜单标题" />
-        <el-table-column prop="component" label="路由名称" />
+        <el-table-column prop="path" label="地址" />
+        <el-table-column prop="component" label="组件路径" />
         <el-table-column prop="sortValue" label="排序" />
         <el-table-column prop="status" label="状态">
           <template #default="{ row }">
@@ -68,7 +69,10 @@
       <el-form-item label="菜单标题" v-bind="{ ...formItemConfig }">
         <el-input v-model="menu.title" autocomplete="off" />
       </el-form-item>
-      <el-form-item label="路由名称" v-bind="{ ...formItemConfig }">
+      <el-form-item label="地址" v-bind="{ ...formItemConfig }">
+        <el-input v-model="menu.path" autocomplete="off" />
+      </el-form-item>
+      <el-form-item label="路由路径" v-bind="{ ...formItemConfig }">
         <el-input v-model="menu.component" autocomplete="off" />
       </el-form-item>
       <el-form-item label="排序" v-bind="{ ...formItemConfig }">
@@ -110,7 +114,8 @@ const menu = reactive<SYSTEM.menu>({
   component: "",
   status: 1,
   sortValue:1,
-  parentId:0
+  parentId:0,
+  path:''
 });
 let title = ref("");
 let tableData = ref<SYSTEM.menu[]>([]);
@@ -135,6 +140,7 @@ const updateClick = (row: SYSTEM.menu) => {
   menu.status = row.status;
   menu.component = row.component;
   menu.sortValue = row.sortValue;
+  menu.path = row.path
   dialogShow.value = true;
 };
 const restForm = () => {
@@ -142,6 +148,7 @@ const restForm = () => {
   menu.title = "";
   menu.component = "";
   menu.sortValue = 1;
+  menu.path = '';
 };
 const cancelHandler = () => {
   dialogShow.value = false;

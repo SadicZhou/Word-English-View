@@ -2,10 +2,10 @@ import { ElMessage } from 'element-plus';
 import { login } from "@/service/user"
 import { useRouter } from "vue-router";
 import { Ref } from 'vue';
-import router from "@/router"
-import { useUserStore } from '@/store/user';
-const userStore = useUserStore()
+import { usePermissonStore } from '@/store/permission';
+const permissonStore = usePermissonStore()
 export async function useLogin(form: LOGIN.loginParams, saving: Ref<boolean>) {
+    const router = useRouter()
     if (!form.account) {
         return ElMessage.error("账号不能为空");
     }
@@ -19,7 +19,7 @@ export async function useLogin(form: LOGIN.loginParams, saving: Ref<boolean>) {
             const { data, message } = res
             console.log(data, "data=====>")
             ElMessage.success(message)
-            const dynamicRoue = await userStore.getDynamicRoue()
+            const dynamicRoue = await permissonStore.getDynamicRoue()
             // 跳转首页
             console.log(router, useRouter)
             router.push("/layout");

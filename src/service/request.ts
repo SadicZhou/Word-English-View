@@ -1,10 +1,11 @@
 import axios from "axios";
+import pinia from "@/store/store";
 import { useUserStore } from "@/store/user";
 import { tokenWhiteList } from "@/config/whiteList";
 const instance = axios.create({
     timeout: 10 * 1000,
 })
-const UserStore = useUserStore()
+const UserStore = useUserStore(pinia)
 /**请求拦截器 */
 instance.interceptors.request.use(config => {
     //console.log(config)

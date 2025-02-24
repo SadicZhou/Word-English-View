@@ -1,4 +1,9 @@
+import { App } from 'vue';
 import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router'
+import pinia from '@/store/store';
+import { usePermissonStore } from '@/store/permission'
+const PermissonStore = usePermissonStore(pinia)
+console.log(PermissonStore, 'PermissonStore')
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
@@ -40,5 +45,8 @@ const router = createRouter({
   history: createWebHashHistory(),
   routes
 })
+//前置路由导航守卫，用来根据用户刷新路由
 
-export default router
+export const initRouter = (app: App<Element>) => {
+  app.use(router)
+}
