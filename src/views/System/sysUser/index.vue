@@ -170,7 +170,7 @@
       <el-form-item label="角色" v-bind="{ ...formItemConfig }">
         <el-checkbox-group v-model="userRole.roleList">
           <el-checkbox
-            v-for="(item, key) in boxList"
+            v-for="(item) in boxList"
             :key="item.id"
             :label="item.roleName"
             :value="item.id"

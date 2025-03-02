@@ -2,9 +2,11 @@ import axios from "axios";
 import pinia from "@/store/store";
 import { useUserStore } from "@/store/user";
 import { tokenWhiteList } from "@/config/whiteList";
+import { useRouter } from "vue-router";
 const instance = axios.create({
     timeout: 10 * 1000,
 })
+const rouer = useRouter()
 const UserStore = useUserStore(pinia)
 /**请求拦截器 */
 instance.interceptors.request.use(config => {
@@ -21,7 +23,11 @@ instance.interceptors.response.use(response => {
     const { data } = response
     console.info('请求成功========>', data, response)
     if (data.data) {
-        const { data: { token } } = data
+        const { data: { token }, code } = data
+        if (code == '208') {
+            rouer.push('/login')
+            return
+        }
         //刷新token
         if (token) {
             UserStore.refeshToken(token)

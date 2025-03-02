@@ -118,6 +118,7 @@ declare namespace SYSTEM {
         parentId?: number,
         title: string,
         component: string,
+        name?: string,
         sortValue?: number,
         status?: number,
         children?: menu[]

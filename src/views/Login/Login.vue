@@ -47,6 +47,7 @@
 import { onMounted, reactive, ref } from 'vue';
 import {valiDateCode } from "@/service/user"
 import {useLogin} from "./hooks"
+const {onSubmit} = useLogin()
 // 状态
 const saving = ref(false);
 // 避免自动填充
@@ -80,7 +81,7 @@ async function getValiDateCode() {
 }
 // 登录
 async function toLogin() {
-	useLogin(form,saving)
+	onSubmit(form,saving)
 }
 </script>
 
