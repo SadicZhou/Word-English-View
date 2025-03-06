@@ -42,6 +42,7 @@
         :data="tableData" 
         v-bind="{ ...tableConfig }"
         row-key="id"
+        v-loading="loading"
       >
       <el-table-column prop="title" label="菜单标题" />
         <el-table-column prop="component" label="路由名称" />
@@ -154,9 +155,10 @@ const menu = reactive<SYSTEM.menu>({
 let title = ref("");
 let tableData = ref<SYSTEM.menu[]>([]);
 let totalNum = ref(0);
-let current = ref(1);
+let loading = ref(false); // 添加 loading 状态
 
 const getMenuList = async () => {
+  loading.value = true; // 开始加载
   try {
     const res = await menuList();
     console.log(res.data, "====>menuList");
@@ -165,6 +167,8 @@ const getMenuList = async () => {
   } catch (error) {
     console.log(error);
     return [];
+  } finally {
+    loading.value = false; // 加载完成
   }
 };
 const updateClick = (row: SYSTEM.menu) => {

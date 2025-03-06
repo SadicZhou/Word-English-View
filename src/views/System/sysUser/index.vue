@@ -44,8 +44,6 @@
       <el-row>
         <el-col :span="24">
           <el-button type="primary" :icon="Plus" @click="addClick">新增用户</el-button>
-          <el-button type="danger" :icon="Delete" @click="batchDelete" :disabled="!hasSelection">批量删除</el-button>
-          <el-button :icon="Download" @click="exportData">导出</el-button>
         </el-col>
       </el-row>
     </el-card>
@@ -55,6 +53,7 @@
       <el-table 
         :data="tableData" 
         v-bind="{ ...tableConfig }"
+        v-loading="loading"
       >
         <el-table-column prop="id" label="ID" width="80" />
         <el-table-column prop="userName" label="用户名" />
@@ -110,7 +109,7 @@
         background
         layout="total, sizes, prev, pager, next, jumper"
         :total="totalNum"
-        :page-sizes="[10, 20, 50, 100]"
+        :page-sizes="pageNationConfig.pageSizes"
         v-model:current-page="current"
         v-model:page-size="pageSize"
         @size-change="handleSizeChange"
@@ -227,7 +226,6 @@ import { HOOKS } from "@/hooks";
 // 新增的变量
 const userFormRef = ref();
 const pageSize = ref(10);
-const selectedRows = ref([]);
 const hasSelection = ref(false);
 
 const handleAvatarSuccess = (response: RES.response<string>) => {
@@ -267,6 +265,7 @@ let userRole = reactive({
   roleList: <number[]>[],
   userId: 0,
 });
+let loading = ref(false); // 添加 loading 状态
 
 // 重置搜索条件
 const resetSearch = () => {
@@ -289,6 +288,7 @@ const handleCurrentChange = (page:number) => {
 
 const getUserList = async () => {
   try {
+   loading.value = true; // 开始加载
     const { data } = await userList({
       current: current.value,
       limit: pageSize.value,
@@ -304,6 +304,8 @@ const getUserList = async () => {
   } catch (error) {
     console.log(error);
     return [];
+  }finally{
+    loading.value = false; // 加载完成
   }
 };
 

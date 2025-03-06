@@ -42,6 +42,7 @@
       <el-table 
         :data="tableData" 
         v-bind="{ ...tableConfig }"
+        v-loading="loading"
       >
         <el-table-column type="selection" width="55" />
         <el-table-column prop="id" label="ID" width="80" />
@@ -177,6 +178,8 @@ let role = reactive<SYSTEM.role>({
 let assiginMenuDialog = ref(false);
 let menuList = ref<SYSTEM.menu[]>([]);
 let roleMenuIds = ref<number[]>([]);
+  let loading = ref(false); // 添加 loading 状态
+
 let assignMenuIdList = ref<{ id: string, isHalf: number }[]>([]);
 const defaultProps = {
   children: "children",
@@ -200,6 +203,8 @@ const handleCurrentChange = (page:number) => {
 
 const getRoleList = async () => {
   try {
+  loading.value = true; // 开始加载
+
     const { data } = await roleList({
       current: current.value,
       limit: pageSize.value,
@@ -213,6 +218,8 @@ const getRoleList = async () => {
   } catch (error) {
     console.log(error);
     return [];
+  }finally {
+    loading.value = false; // 结束加载
   }
 };
 
