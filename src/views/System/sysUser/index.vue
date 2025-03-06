@@ -1,6 +1,7 @@
 <template>
   <div class="content">
-    <el-card :body-style="cardPad" style="margin-top: 10px">
+    <!-- 搜索区域 -->
+    <el-card :body-style="cardPad" class="search-card">
       <el-row>
         <div class="keyword">关键字</div>
         <el-col :span="4">
@@ -24,40 +25,62 @@
           </el-config-provider>
         </el-col>
       </el-row>
-      <el-row style="margin-top: 10px">
-        <el-col :span="2">
-          <el-button
-            type="success"
-            :icon="Search"
-            size="small"
-            @click="getUserList()"
-            >搜索</el-button
-          >
+      <el-row class="search-buttons">
+        <el-col :span="24">
+          <div class="button-container">
+            <el-button
+              type="primary"
+              :icon="Search"
+              @click="getUserList()"
+            >搜索</el-button>
+            <el-button :icon="Refresh" @click="resetSearch">重置</el-button>
+          </div>
         </el-col>
       </el-row>
     </el-card>
-    <el-card :body-style="cardPad" class="mt-10">
+    
+    <!-- 操作区域 -->
+    <el-card :body-style="cardPad" class="action-card">
       <el-row>
-        <el-col :span="2">
-          <el-button size="small" type="primary" :icon="Plus" @click="addClick"
-            >新增</el-button
-          >
+        <el-col :span="24">
+          <el-button type="primary" :icon="Plus" @click="addClick">新增用户</el-button>
+          <el-button type="danger" :icon="Delete" @click="batchDelete" :disabled="!hasSelection">批量删除</el-button>
+          <el-button :icon="Download" @click="exportData">导出</el-button>
         </el-col>
       </el-row>
     </el-card>
-    <div class="conheight">
-      <el-table :data="tableData" v-bind="{ ...tableConfig }">
-        <el-table-column prop="id" label="ID" />
+    
+    <!-- 表格区域 -->
+    <div class="table-container">
+      <el-table 
+        :data="tableData" 
+        v-bind="{ ...tableConfig }"
+        @selection-change="handleSelectionChange"
+        border
+        stripe
+        highlight-current-row
+      >
+        <el-table-column type="selection" width="55" />
+        <el-table-column prop="id" label="ID" width="80" />
         <el-table-column prop="userName" label="用户名" />
         <el-table-column prop="name" label="姓名" />
-        <el-table-column prop="avatar" label="头像">
+        <el-table-column prop="avatar" label="头像" width="100" align="center">
           <template #default="{ row }">
-            <img class="avatar" :src="row.avatar" alt="" />
+            <el-avatar :size="40" :src="row.avatar" @error="avatarError">
+              {{ row.name ? row.name.substring(0, 1).toUpperCase() : 'U' }}
+            </el-avatar>
           </template>
         </el-table-column>
         <el-table-column prop="phone" label="手机" />
-        <el-table-column prop="description" label="备注" />
-        <el-table-column fixed="right" label="操作">
+        <el-table-column prop="description" label="备注" show-overflow-tooltip />
+        <el-table-column prop="status" label="状态" width="80" align="center">
+          <template #default="{ row }">
+            <el-tag :type="row.status === 1 ? 'success' : 'danger'">
+              {{ row.status === 1 ? '正常' : '停用' }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column fixed="right" label="操作" width="220" align="center">
           <template #default="{ row }">
             <el-button
               link
@@ -69,14 +92,14 @@
             </el-button>
             <el-button
               link
-              type="primary"
+              type="danger"
               size="small"
               @click="deleteClick(row)"
               >删除</el-button
             >
             <el-button
               link
-              type="primary"
+              type="success"
               size="small"
               @click="assigningRoles(row)"
               >分配角色</el-button
@@ -85,24 +108,25 @@
         </el-table-column>
       </el-table>
     </div>
-    <div class="page">
+    
+    <!-- 分页区域 -->
+    <div class="pagination-container">
       <el-pagination
-        size="small"
         background
-        layout="prev, pager, next"
+        layout="total, sizes, prev, pager, next, jumper"
         :total="totalNum"
-        class="mt-4"
-        :page-sizes:="pageNationConfig.pageSizes"
+        :page-sizes="[10, 20, 50, 100]"
         v-model:current-page="current"
+        v-model:page-size="pageSize"
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
       />
     </div>
   </div>
-  <!-- 新增/修改用户-->
-  <el-dialog v-model="dialogShow" width="500">
-    <template #header>
-      <div class="titStyle">{{ title }}</div>
-    </template>
-    <el-form :model="user" v-bind="{ ...formConfig }">
+  
+  <!-- 新增/修改用户对话框 -->
+  <el-dialog v-model="dialogShow" width="500" :title="title" destroy-on-close>
+    <el-form :model="user" v-bind="{ ...formConfig }" ref="userFormRef">
       <el-form-item label="头像" v-bind="{ ...formItemConfig }">
         <el-upload
           class="avatar-uploader"
@@ -152,17 +176,15 @@
       </el-form-item>
     </el-form>
     <template #footer>
-      <div>
+      <div class="dialog-footer">
         <el-button @click="cancelHandler">取消</el-button>
-        <el-button type="primary" @click="confirmHandler()"> 确认 </el-button>
+        <el-button type="primary" @click="confirmHandler()">确认</el-button>
       </div>
     </template>
   </el-dialog>
-  <!-- 分配角色 -->
-  <el-dialog v-model="assainRoleDialog" width="500">
-    <template #header>
-      <div class="titStyle">{{ title }}</div>
-    </template>
+  
+  <!-- 分配角色对话框 -->
+  <el-dialog v-model="assainRoleDialog" width="500" :title="title" destroy-on-close>
     <el-form :model="userRole">
       <el-form-item label="用户名" v-bind="{ ...formItemConfig }">
         <el-input v-model="userRole.userName" autocomplete="off" disabled />
@@ -170,7 +192,7 @@
       <el-form-item label="角色" v-bind="{ ...formItemConfig }">
         <el-checkbox-group v-model="userRole.roleList">
           <el-checkbox
-            v-for="(item) in boxList"
+            v-for="item in boxList"
             :key="item.id"
             :label="item.roleName"
             :value="item.id"
@@ -179,18 +201,16 @@
       </el-form-item>
     </el-form>
     <template #footer>
-      <div>
+      <div class="dialog-footer">
         <el-button @click="assignRoleCancelHandler">取消</el-button>
-        <el-button type="primary" @click="assignRoleConfirmHandler">
-          提交
-        </el-button>
+        <el-button type="primary" @click="assignRoleConfirmHandler">提交</el-button>
       </div>
     </template>
   </el-dialog>
 </template>
 
 <script lang="ts" setup>
-import { Search, Plus } from "@element-plus/icons-vue";
+import { Search, Plus, Delete, Download, Refresh } from "@element-plus/icons-vue";
 import { onMounted, reactive, ref } from "vue";
 import {
   updateSysUser,
@@ -209,14 +229,28 @@ import { findAllRoles } from "@/service/role";
 import { Code } from "@/config/code";
 import { HOOKS } from "@/hooks";
 
+// 新增的变量
+const userFormRef = ref();
+const pageSize = ref(10);
+const selectedRows = ref([]);
+const hasSelection = ref(false);
+
 const handleAvatarSuccess = (response: RES.response<string>) => {
   user.avatar = response.data;
 };
+
 const beforeAvatarUpload = () => {};
+
+const avatarError = () => {
+  // 头像加载失败时的处理
+  return true;
+};
+
 const searchForm = reactive({
   keyword: "",
   dateRange: [],
 });
+
 let title = ref("新增");
 let tableData = ref<SYSTEM.user[]>([]);
 let totalNum = ref(0);
@@ -238,11 +272,59 @@ let userRole = reactive({
   roleList: <number[]>[],
   userId: 0,
 });
+
+// 处理表格选择变化
+const handleSelectionChange = (selection) => {
+  selectedRows.value = selection;
+  hasSelection.value = selection.length > 0;
+};
+
+// 批量删除
+const batchDelete = () => {
+  if (selectedRows.value.length === 0) {
+    ElMessage.warning('请至少选择一条记录');
+    return;
+  }
+  
+  ElMessageBox.confirm(`确定要删除选中的 ${selectedRows.value.length} 条记录吗?`, "提示", {
+    confirmButtonText: "确定",
+    cancelButtonText: "取消",
+    type: "warning",
+  }).then(() => {
+    ElMessage.success('批量删除功能待实现');
+    // 实际删除逻辑
+  });
+};
+
+// 导出数据
+const exportData = () => {
+  ElMessage.info('导出功能待实现');
+};
+
+// 重置搜索条件
+const resetSearch = () => {
+  searchForm.keyword = '';
+  searchForm.dateRange = [];
+  getUserList();
+};
+
+// 处理分页大小变化
+const handleSizeChange = (size) => {
+  pageSize.value = size;
+  getUserList();
+};
+
+// 处理页码变化
+const handleCurrentChange = (page) => {
+  current.value = page;
+  getUserList();
+};
+
 const getUserList = async () => {
   try {
     const { data } = await userList({
-      current: 1,
-      limit: 10,
+      current: current.value,
+      limit: pageSize.value,
       keyword: searchForm.keyword,
       createTimeBegin: searchForm.dateRange[0],
       createTimeEnd: searchForm.dateRange[1],
@@ -415,15 +497,46 @@ onMounted(() => {
 <style scoped lang="scss">
 .content {
   width: 99%;
-  .keyword {
-    font-weight: bold;
-    font-size: 15px;
-    color: #909399;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 0 10px;
+  
+  // 搜索卡片样式
+  .search-card {
+    margin-bottom: 20px;
+    
+    .keyword {
+      font-weight: bold;
+      font-size: 15px;
+      color: #909399;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0 10px;
+    }
+    
+    // 按钮容器样式 - 新增
+    .button-container {
+      display: flex;
+      justify-content: flex-end; // 按钮靠右对齐
+      margin-top: 15px;
+      
+      .el-button {
+        margin-left: 10px; // 按钮之间的间距
+        
+        &:first-child {
+          margin-left: 0; // 第一个按钮不需要左边距
+        }
+      }
+    }
+    
+    // 为搜索栏中的每个元素添加间距
+    :deep(.el-row) {
+      margin-bottom: 15px;
+      
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
   }
+  
   .avatar {
     width: 80px;
     height: 80px;

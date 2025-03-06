@@ -37,25 +37,9 @@ export const usePermissonStore = defineStore("PermissonStore", {
                 const routes: RouteRecordRaw[] = [];
 
                 menus.forEach(menu => {
-                    // 处理一级菜单
-                    if (menu.children && menu.children.length > 0) {
-                        // 如果有子菜单，将子菜单直接添加到routes中
-                        menu.children.forEach(child => {
-                            routes.push({
-                                path: child.path,
-                                name: child.name,
-                                component: child.component
-                                    ? () => import(`@/views/${child.component}.vue`)
-                                    : () => import('@/views/404page/index.vue'),
-                                meta: {
-                                    title: child.title,
-                                    hidden: false
-                                }
-                            });
-                        });
-                    } else if (menu.path) {
-                        // 如果没有子菜单但有路径，直接添加到routes
-                        routes.push({
+                    if (menu.path) {
+                        // 创建当前菜单的路由配置
+                        const route: RouteRecordRaw = {
                             path: menu.path,
                             name: menu.name,
                             component: menu.component
@@ -64,8 +48,21 @@ export const usePermissonStore = defineStore("PermissonStore", {
                             meta: {
                                 title: menu.title,
                                 hidden: false
-                            }
-                        });
+                            },
+                            children: [] // 初始化children为空数组
+                        };
+
+                        // 如果有子菜单，递归处理子菜单
+                        if (menu.children && menu.children.length > 0) {
+                            route.children = generateChildRoutes(menu.children);
+                        }
+
+                        routes.push(route);
+                    } else if (menu.children && menu.children.length > 0) {
+                        // 如果当前菜单没有路径但有子菜单，直接将子菜单添加到routes中
+                        // 这种情况通常是菜单分组，不对应实际页面
+                        const childRoutes = generateChildRoutes(menu.children);
+                        routes.push(...childRoutes);
                     }
                 });
 
@@ -78,7 +75,7 @@ export const usePermissonStore = defineStore("PermissonStore", {
                 name: 'layout',
                 component: () => import('@/views/Layout/index.vue'),
                 redirect: this.menus.length > 0 && this.menus[0].children && this.menus[0].children.length > 0
-                    ? this.menus[0].children[0].path  // 重定向到第一个子菜单
+                    ? (this.menus[0].children[0].path || '/system/user')  // 重定向到第一个子菜单
                     : '/system/user',  // 默认重定向
                 children: generateChildRoutes(this.menus)
             };

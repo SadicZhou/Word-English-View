@@ -35,15 +35,34 @@ const router = createRouter({
  * @param {RouteRecordRaw} route - 要添加的路由配置
  */
 const updateRouter = (route: RouteRecordRaw) => {
-  // 获取layout路由
-  const layoutRoute = router.getRoutes().find(r => r.name === 'layout');
-
-  if (layoutRoute && route.children) {
-    // 将动态路由添加为layout的子路由
-    route.children.forEach(childRoute => {
-      router.addRoute('layout', childRoute);
+  // 先移除所有动态添加的路由
+  try {
+    router.getRoutes().forEach(r => {
+      if (r.name && r.name !== 'Login') {
+        router.removeRoute(r.name);
+      }
     });
-    console.log('动态路由添加成功:', router.getRoutes());
+  } catch (error) {
+    console.error('移除路由失败:', error);
+  }
+
+  // 添加新的动态路由
+  if (route.children && route.children.length > 0) {
+    // 确保layout路由存在
+    const layoutRoute = {
+      path: '/',
+      name: 'Layout',
+      component: () => import('@/views/Layout/index.vue'),
+      children: route.children
+    };
+
+    // 添加layout路由
+    router.addRoute(layoutRoute);
+
+    // 打印添加后的路由
+    console.log('动态路由添加成功，当前路由列表:',
+      router.getRoutes().map(r => ({ name: r.name, path: r.path }))
+    );
   } else {
     console.error('添加动态路由失败: 未找到layout路由或动态路由无子路由');
   }
@@ -73,7 +92,6 @@ router.beforeEach(async (to, from, next) => {
     next('/');
     return;
   }
-
   // 2.2 判断是否已加载动态路由
   if (!hasAddedRoutes) {
     try {

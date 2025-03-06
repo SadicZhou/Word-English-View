@@ -1,0 +1,52 @@
+/* 菜单主题相关的全局样式 */
+
+/* 深色菜单主题 */
+.dark-menu {
+    .el-menu {
+        --el-menu-bg-color: #001529 !important;
+        --el-menu-text-color: rgba(255, 255, 255, 0.65) !important;
+        --el-menu-hover-text-color: #fff !important;
+        --el-menu-active-color: #fff !important;
+        --el-menu-hover-bg-color: #1f2d3d !important;
+    }
+
+    .el-sub-menu__title {
+        color: rgba(255, 255, 255, 0.65) !important;
+    }
+}
+
+/* 浅色菜单主题 */
+.light-menu {
+    .el-menu {
+        --el-menu-bg-color: #fff !important;
+        --el-menu-text-color: #333 !important;
+        --el-menu-hover-text-color: var(--el-color-primary) !important;
+        --el-menu-active-color: var(--el-color-primary) !important;
+        --el-menu-hover-bg-color: #f5f5f5 !important;
+    }
+
+    .el-sub-menu__title {
+        color: #333 !important;
+    }
+}
+
+:root {
+    /* 主题颜色变量 */
+    --menu-bg-color-dark: #001529;
+    --menu-bg-color-light: #fff;
+    --menu-text-color-dark: rgba(255, 255, 255, 0.65);
+    --menu-text-color-light: #333;
+    --menu-active-color-dark: #fff;
+    --menu-active-color-light: var(--el-color-primary);
+    --menu-hover-bg-color-dark: #1f2d3d;
+    --menu-hover-bg-color-light: #f5f5f5;
+}
+
+/* 使用 CSS 变量的菜单主题样式 */
+.dark-menu .menus {
+    background-color: var(--menu-bg-color-dark);
+}
+
+.light-menu .menus {
+    background-color: var(--menu-bg-color-light);
+}

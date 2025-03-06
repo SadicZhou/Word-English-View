@@ -310,4 +310,14 @@ onMounted(() => {
   getRoleList();
 });
 </script>
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.content {
+  .mt-10 {
+    margin-bottom: 20px; /* 添加搜索栏与列表之间的间距 */
+  }
+  
+  .conheight {
+    margin-top: 20px; /* 添加额外的顶部间距 */
+  }
+}
+</style>
