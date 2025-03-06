@@ -6,6 +6,7 @@ const border = false
 export const tableConfig = {
     style: tableStyle,
     border,
-    stripe
+    stripe,
+    highlightCurrentRow: true
 }
 

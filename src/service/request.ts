@@ -25,6 +25,7 @@ instance.interceptors.response.use(response => {
     if (data.data) {
         const { data: { token }, code } = data
         if (code == '208') {
+            UserStore.removeToken()
             rouer.push('/login')
             return
         }

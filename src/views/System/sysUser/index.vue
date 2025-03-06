@@ -55,12 +55,7 @@
       <el-table 
         :data="tableData" 
         v-bind="{ ...tableConfig }"
-        @selection-change="handleSelectionChange"
-        border
-        stripe
-        highlight-current-row
       >
-        <el-table-column type="selection" width="55" />
         <el-table-column prop="id" label="ID" width="80" />
         <el-table-column prop="userName" label="用户名" />
         <el-table-column prop="name" label="姓名" />
@@ -273,34 +268,6 @@ let userRole = reactive({
   userId: 0,
 });
 
-// 处理表格选择变化
-const handleSelectionChange = (selection) => {
-  selectedRows.value = selection;
-  hasSelection.value = selection.length > 0;
-};
-
-// 批量删除
-const batchDelete = () => {
-  if (selectedRows.value.length === 0) {
-    ElMessage.warning('请至少选择一条记录');
-    return;
-  }
-  
-  ElMessageBox.confirm(`确定要删除选中的 ${selectedRows.value.length} 条记录吗?`, "提示", {
-    confirmButtonText: "确定",
-    cancelButtonText: "取消",
-    type: "warning",
-  }).then(() => {
-    ElMessage.success('批量删除功能待实现');
-    // 实际删除逻辑
-  });
-};
-
-// 导出数据
-const exportData = () => {
-  ElMessage.info('导出功能待实现');
-};
-
 // 重置搜索条件
 const resetSearch = () => {
   searchForm.keyword = '';
@@ -309,13 +276,13 @@ const resetSearch = () => {
 };
 
 // 处理分页大小变化
-const handleSizeChange = (size) => {
+const handleSizeChange = (size:number) => {
   pageSize.value = size;
   getUserList();
 };
 
 // 处理页码变化
-const handleCurrentChange = (page) => {
+const handleCurrentChange = (page:number) => {
   current.value = page;
   getUserList();
 };

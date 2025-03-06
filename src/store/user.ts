@@ -1,3 +1,4 @@
+import { remove } from "lodash";
 import { defineStore } from "pinia";
 export const useUserStore = defineStore('userStore', {
     state: () => ({
@@ -8,6 +9,10 @@ export const useUserStore = defineStore('userStore', {
             this.token = token
             localStorage.setItem("token", token)
         },
+        removeToken() {
+            this.token = ""
+            localStorage.removeItem("token")
+        }
 
     },
     getters: {

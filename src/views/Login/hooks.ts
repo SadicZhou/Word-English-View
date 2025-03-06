@@ -22,7 +22,7 @@ export function useLogin() {
                 const { data, message } = res
                 ElMessage.success(message)
                 // 跳转首页
-                router.push("/layout");
+                router.push("/");
             } else {
                 ElMessage.error(res.message);
 
