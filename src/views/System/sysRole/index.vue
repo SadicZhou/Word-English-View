@@ -214,9 +214,7 @@ const getRoleList = async () => {
     tableData.value = list;
     totalNum.value = total;
     current.value = pageNum;
-    console.log(tableData, "tableData");
   } catch (error) {
-    console.log(error);
     return [];
   }finally {
     loading.value = false; // 结束加载
@@ -301,7 +299,6 @@ const assignMenu = async (row: SYSTEM.role) => {
     const { data } = await findSysRoleMenuByRoleId({ id: String(row.id) });
     menuList.value = data.menus;
     roleMenuIds.value = data.menusIds;
-    console.log(data, roleMenuIds, "当前角色菜单");
     assiginMenuDialog.value = true;
   } catch (error) {
     HOOKS.useError()

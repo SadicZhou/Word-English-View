@@ -300,9 +300,7 @@ const getUserList = async () => {
     tableData.value = list;
     totalNum.value = total;
     current.value = pageNum;
-    console.log(tableData, "tableData");
   } catch (error) {
-    console.log(error);
     return [];
   }finally{
     loading.value = false; // 加载完成
@@ -337,7 +335,6 @@ const confirmHandler = async () => {
   try {
     if (title.value == "修改用户") {
       const res = await updateSysUser(user);
-      console.log("res");
       if (
         res.code == Code.SUCCESS_CODE &&
         res.message ==Code.SUCCESS
@@ -358,7 +355,6 @@ const confirmHandler = async () => {
     }
     if (title.value == "新增用户") {
       const res = await saveSysUser(user);
-      console.log("res");
       if (res.code == Code.SUCCESS_CODE && res.message ==Code.SUCCESS) {
         dialogShow.value = false;
         getUserList();
@@ -416,7 +412,6 @@ const assigningRoles = async (row: SYSTEM.user) => {
     const { data } = await findAllRoles({
       id: String(row.id),
     });
-    console.log(data, "====>rolelist");
     const { roleList, userRoleList } = data;
     boxList = roleList;
     userRole.roleList = userRoleList.map((item) => {

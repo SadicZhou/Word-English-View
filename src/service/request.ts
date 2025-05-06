@@ -3,6 +3,8 @@ import pinia from "@/store/store";
 import { useUserStore } from "@/store/user";
 import { tokenWhiteList } from "@/config/whiteList";
 import { useRouter } from "vue-router";
+import { HOOKS } from "@/hooks"; // Adjust the import path as necessary
+
 const instance = axios.create({
     timeout: 10 * 1000,
 })
@@ -22,13 +24,16 @@ instance.interceptors.request.use(config => {
 instance.interceptors.response.use(response => {
     const { data } = response
     console.info('请求成功========>', data, response)
+    const { code } = data
+    if (code == '208') {
+        UserStore.removeToken()
+        rouer.push('/login')
+        HOOKS.useError('登录失效，请重新登录')
+        return
+    }
     if (data.data) {
-        const { data: { token }, code } = data
-        if (code == '208') {
-            UserStore.removeToken()
-            rouer.push('/login')
-            return
-        }
+        const { data: { token } } = data
+
         //刷新token
         if (token) {
             UserStore.refeshToken(token)

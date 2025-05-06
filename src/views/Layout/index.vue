@@ -1,21 +1,31 @@
 <template>
-  <div class="layout" :class="[
-    themeStore.menuTheme === 'light' ? 'light-menu' : 'dark-menu',
-    themeStore.compactMenu ? 'compact-menu' : ''
-  ]">
+  <div
+    class="layout"
+    :class="[
+      themeStore.menuTheme === 'light' ? 'light-menu' : 'dark-menu',
+      themeStore.compactMenu ? 'compact-menu' : '',
+    ]"
+  >
     <!-- 左侧菜单 -->
     <div class="menus" :class="{ 'is-collapsed': isCollapse }">
       <!-- Logo 区域 -->
-      <div class="tech-logo" :class="{ 'light-logo': themeStore.menuTheme === 'light' }">
+      <div
+        class="tech-logo"
+        :class="{ 'light-logo': themeStore.menuTheme === 'light' }"
+      >
         <div class="logo-text" v-if="!isCollapse">管理系统</div>
         <div class="logo-icon" v-else>系</div>
       </div>
-      
+
       <!-- 菜单 -->
       <el-menu
-        :active-text-color="themeStore.menuTheme === 'dark' ? '#fff' : themeStore.themeColor"
+        :active-text-color="
+          themeStore.menuTheme === 'dark' ? '#fff' : themeStore.themeColor
+        "
         :background-color="themeStore.menuTheme === 'dark' ? '#001529' : '#fff'"
-        :text-color="themeStore.menuTheme === 'dark' ? 'rgba(255, 255, 255, 0.65)' : '#333'"
+        :text-color="
+          themeStore.menuTheme === 'dark' ? 'rgba(255, 255, 255, 0.65)' : '#333'
+        "
         :default-active="activeMenu"
         class="el-menu-vertical-demo"
         :collapse="isCollapse"
@@ -24,28 +34,37 @@
         <!-- 动态生成菜单 -->
         <template v-for="menu in menuList" :key="menu.id || menu.path">
           <!-- 有子菜单的情况 -->
-          <el-sub-menu v-if="menu.children && menu.children.length > 0" :index="menu.path || String(menu.id)">
+          <el-sub-menu
+            v-if="menu.children && menu.children.length > 0"
+            :index="menu.path || String(menu.id)"
+          >
             <template #title>
               <el-icon>
                 <component :is="getMenuIcon(menu.icon)" />
               </el-icon>
               <span>{{ menu.title }}</span>
             </template>
-            
+
             <!-- 递归渲染子菜单 -->
-            <template v-for="subMenu in menu.children" :key="subMenu.id || subMenu.path">
+            <template
+              v-for="subMenu in menu.children"
+              :key="subMenu.id || subMenu.path"
+            >
               <!-- 子菜单还有子菜单 -->
-              <el-sub-menu v-if="subMenu.children && subMenu.children.length > 0" :index="subMenu.path || String(subMenu.id)">
+              <el-sub-menu
+                v-if="subMenu.children && subMenu.children.length > 0"
+                :index="subMenu.path || String(subMenu.id)"
+              >
                 <template #title>
                   <el-icon>
                     <component :is="getMenuIcon(subMenu.icon)" />
                   </el-icon>
                   <span>{{ subMenu.title }}</span>
                 </template>
-                
-                <el-menu-item 
-                  v-for="item in subMenu.children" 
-                  :key="item.id || item.path" 
+
+                <el-menu-item
+                  v-for="item in subMenu.children"
+                  :key="item.id || item.path"
                   :index="item.path"
                 >
                   <el-icon>
@@ -54,7 +73,7 @@
                   <template #title>{{ item.title }}</template>
                 </el-menu-item>
               </el-sub-menu>
-              
+
               <!-- 子菜单没有子菜单 -->
               <el-menu-item v-else :index="subMenu.path">
                 <el-icon>
@@ -64,7 +83,7 @@
               </el-menu-item>
             </template>
           </el-sub-menu>
-          
+
           <!-- 没有子菜单的情况 -->
           <el-menu-item v-else :index="menu.path">
             <el-icon>
@@ -75,7 +94,7 @@
         </template>
       </el-menu>
     </div>
-    
+
     <div class="content">
       <el-card>
         <div class="content_top">
@@ -89,30 +108,40 @@
             <!-- 面包屑导航 -->
             <el-breadcrumb separator="/">
               <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-              <el-breadcrumb-item v-for="(item, index) in breadcrumbList" :key="index">
+              <el-breadcrumb-item
+                v-for="(item, index) in breadcrumbList"
+                :key="index"
+              >
                 {{ item.title }}
               </el-breadcrumb-item>
             </el-breadcrumb>
           </div>
-          
+
           <!-- 功能按钮区域 -->
           <div class="header-actions">
             <el-tooltip content="主题设置" placement="bottom">
-              <el-icon class="header-icon" @click="openThemeSettings"><Setting /></el-icon>
+              <el-icon class="header-icon" @click="openThemeSettings"
+                ><Setting
+              /></el-icon>
             </el-tooltip>
           </div>
-          
+
           <!-- 用户信息 -->
           <el-dropdown trigger="click" @command="handleCommand">
             <span class="user-dropdown">
-              <el-avatar :size="32" src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png" />
-              <span class="username">{{ userInfo.username || '管理员' }}</span>
+              <el-avatar
+                :size="32"
+                src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
+              />
+              <span class="username">{{ userInfo.username || "管理员" }}</span>
             </span>
             <template #dropdown>
               <el-dropdown-menu>
                 <el-dropdown-item command="profile">个人信息</el-dropdown-item>
                 <el-dropdown-item command="password">修改密码</el-dropdown-item>
-                <el-dropdown-item divided command="logout">退出登录</el-dropdown-item>
+                <el-dropdown-item divided command="logout"
+                  >退出登录</el-dropdown-item
+                >
               </el-dropdown-menu>
             </template>
           </el-dropdown>
@@ -126,7 +155,7 @@
         </router-view>
       </div>
     </div>
-    
+
     <!-- 主题设置抽屉 -->
     <ThemeSettings ref="themeSettingsRef" />
   </div>
@@ -138,10 +167,10 @@ import { useRoute, useRouter } from "vue-router";
 import { usePermissonStore } from "@/store/permission";
 import { useUserStore } from "@/store/user";
 import { useThemeStore } from "@/store/theme";
-import { 
-  Setting, 
-  Menu as IconMenu, 
-  User, 
+import {
+  Setting,
+  Menu as IconMenu,
+  User,
   List,
   Odometer,
   DataAnalysis,
@@ -155,11 +184,11 @@ import {
   Goods,
   Shop,
   Picture,
-  Histogram
+  Histogram,
 } from "@element-plus/icons-vue";
 import { ElMessage, ElMessageBox } from "element-plus";
-import { Component } from 'vue';
-import ThemeSettings from '@/components/ThemeSettings/index.vue';
+import { Component } from "vue";
+import ThemeSettings from "@/components/ThemeSettings/index.vue";
 
 // 导入图片
 const open = require("@/assets/open_menu.png");
@@ -180,8 +209,8 @@ const isCollapse = ref(false);
 
 // 用户信息
 const userInfo = reactive({
-  username: userStore.username || localStorage.getItem('username') || '管理员',
-  avatar: userStore.avatar || localStorage.getItem('avatar') || ''
+  username: userStore.username || localStorage.getItem("username") || "管理员",
+  avatar: userStore.avatar || localStorage.getItem("avatar") || "",
 });
 
 // 当前激活的菜单
@@ -191,7 +220,6 @@ const activeMenu = computed(() => {
 
 // 获取菜单列表
 const menuList = computed(() => {
-  console.log('从 permissionStore 获取菜单数据:', permissionStore.menus);
   return permissionStore.menus || [];
 });
 
@@ -199,7 +227,7 @@ const menuList = computed(() => {
 const breadcrumbList = computed(() => {
   const result: any[] = [];
   const path = route.path;
-  
+
   // 查找当前路由对应的菜单项
   const findMenuByPath = (menus: any[], targetPath: string): any | null => {
     for (const menu of menus) {
@@ -216,12 +244,12 @@ const breadcrumbList = computed(() => {
     }
     return null;
   };
-  
+
   const currentMenu = findMenuByPath(menuList.value, path);
   if (currentMenu) {
     result.push(currentMenu);
   }
-  
+
   return result;
 });
 
@@ -232,28 +260,28 @@ const breadcrumbList = computed(() => {
  */
 const getMenuIcon = (iconName: string | undefined): Component => {
   if (!iconName) return IconMenu;
-  
+
   const iconMap: Record<string, Component> = {
-    'setting': Setting,
-    'menu': IconMenu,
-    'user': User,
-    'list': List,
-    'dashboard': Odometer,
-    'analysis': DataAnalysis,
-    'profile': UserFilled,
-    'home': HomeFilled,
-    'document': Document,
-    'location': Location,
-    'tickets': Tickets,
-    'bell': Bell,
-    'credit-card': CreditCard,
-    'goods': Goods,
-    'shop': Shop,
-    'picture': Picture,
-    'histogram': Histogram,
+    setting: Setting,
+    menu: IconMenu,
+    user: User,
+    list: List,
+    dashboard: Odometer,
+    analysis: DataAnalysis,
+    profile: UserFilled,
+    home: HomeFilled,
+    document: Document,
+    location: Location,
+    tickets: Tickets,
+    bell: Bell,
+    "credit-card": CreditCard,
+    goods: Goods,
+    shop: Shop,
+    picture: Picture,
+    histogram: Histogram,
     // 可以根据需要添加更多图标映射
   };
-  
+
   return iconMap[iconName] || IconMenu;
 };
 
@@ -263,29 +291,34 @@ const getMenuIcon = (iconName: string | undefined): Component => {
 const toggleCollapse = () => {
   isCollapse.value = !isCollapse.value;
   // 将折叠状态保存到localStorage
-  localStorage.setItem('menuCollapsed', isCollapse.value.toString());
+  localStorage.setItem("menuCollapsed", isCollapse.value.toString());
 };
 
 /**
  * 处理下拉菜单命令
  */
 const handleCommand = (command: string) => {
-  if (command === 'logout') {
-    ElMessageBox.confirm('确定要退出登录吗?', '提示', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning'
-    }).then(() => {
-      // 清除token和用户信息
-      userStore.logout();
-      // 重置路由状态
-      router.push('/login');
-      ElMessage.success('退出登录成功');
-    }).catch(() => {});
-  } else if (command === 'profile') {
-    router.push('/profile');
-  } else if (command === 'password') {
-    ElMessage.info('修改密码功能开发中');
+  if (command === "logout") {
+    ElMessageBox.confirm("确定要退出登录吗?", "提示", {
+      confirmButtonText: "确定",
+      cancelButtonText: "取消",
+      type: "warning",
+    })
+      .then(async () => {
+        // 清除token和用户信息
+        // userStore.logout();
+        await userStore.removeToken(); // 清除本地存储的token
+        localStorage.removeItem("username"); // 清除本地存储的用户名
+        localStorage.removeItem("avatar"); // 清除本地存储的头像
+        // 重置路由状态
+        router.push("/login");
+        ElMessage.success("退出登录成功");
+      })
+      .catch(() => {});
+  } else if (command === "profile") {
+    router.push("/profile");
+  } else if (command === "password") {
+    ElMessage.info("修改密码功能开发中");
   }
 };
 
@@ -298,41 +331,47 @@ const openThemeSettings = () => {
 const fetchMenuData = async () => {
   try {
     await permissionStore.getDynamicRoue();
-    console.log('菜单数据获取成功:', permissionStore.menus);
   } catch (error) {
-    console.error('获取菜单数据失败:', error);
-    ElMessage.error('获取菜单数据失败，请刷新页面重试');
+    console.error("获取菜单数据失败:", error);
+    ElMessage.error("获取菜单数据失败，请刷新页面重试");
   }
 };
 
 // 组件挂载时
 onMounted(async () => {
   // 从localStorage恢复菜单折叠状态
-  const savedCollapsed = localStorage.getItem('menuCollapsed');
+  const savedCollapsed = localStorage.getItem("menuCollapsed");
   if (savedCollapsed !== null) {
-    isCollapse.value = savedCollapsed === 'true';
+    isCollapse.value = savedCollapsed === "true";
   }
-  
+
   // 获取菜单数据
   if (!permissionStore.menus || permissionStore.menus.length === 0) {
     await fetchMenuData();
   }
-  
+
   // 打印调试信息
-  console.log('Layout 组件已挂载');
-  console.log('permissionStore 状态:', permissionStore.$state);
-  console.log('菜单数据:', menuList.value);
+  // console.log("Layout 组件已挂载");
+  // console.log("permissionStore 状态:", permissionStore.$state);
+  // console.log("菜单数据:", menuList.value);
 });
 
 // 监听路由变化，更新激活的菜单
-watch(() => route.path, (newPath) => {
-  console.log('路由路径变化:', newPath);
-}, { immediate: true });
+watch(
+  () => route.path,
+  (newPath) => {
+  },
+  { immediate: true }
+);
 
 // 监听 permissionStore.menus 的变化
-watch(() => permissionStore.menus, (newMenus) => {
-  console.log('permissionStore.menus 已更新:', newMenus);
-}, { deep: true });
+watch(
+  () => permissionStore.menus,
+  (newMenus) => {
+    // console.log("permissionStore.menus 已更新:", newMenus);
+  },
+  { deep: true }
+);
 </script>
 
 <style scoped lang="scss">
@@ -354,127 +393,130 @@ $mw: 200px;
   height: 100%;
   box-sizing: border-box;
   background-color: #f0f2f5;
-  
+
   // 深色菜单主题
   &.dark-menu {
     .menus {
       background-color: #001529;
-      
+
       .tech-logo {
         background-color: #002140;
         border-bottom: 1px solid #003a70;
-        
-        .logo-text, .logo-icon {
+
+        .logo-text,
+        .logo-icon {
           color: #fff;
         }
       }
-      
+
       // 覆盖 Element Plus 菜单样式
       :deep(.el-menu) {
         background-color: #001529 !important;
-        
+
         .el-menu-item {
           color: rgba(255, 255, 255, 0.65) !important;
-          
+
           &:hover {
             color: #fff !important;
             background-color: #1f2d3d !important;
           }
-          
+
           &.is-active {
             color: #fff !important;
             background-color: var(--el-color-primary) !important;
           }
         }
-        
+
         .el-sub-menu__title {
           color: rgba(255, 255, 255, 0.65) !important;
-          
+
           &:hover {
             color: #fff !important;
             background-color: #1f2d3d !important;
           }
         }
-        
+
         .el-sub-menu.is-active > .el-sub-menu__title {
           color: #fff !important;
         }
       }
     }
   }
-  
+
   // 浅色菜单主题
   &.light-menu {
     .menus {
       background-color: #fff;
-      
+
       .tech-logo {
         background-color: #fff;
         border-bottom: 1px solid #f0f0f0;
-        
-        .logo-text, .logo-icon {
+
+        .logo-text,
+        .logo-icon {
           color: var(--el-color-primary);
         }
       }
-      
+
       // 覆盖 Element Plus 菜单样式
       :deep(.el-menu) {
         background-color: #fff !important;
-        
+
         .el-menu-item {
           color: #333 !important;
-          
+
           &:hover {
             color: var(--el-color-primary) !important;
             background-color: #f5f5f5 !important;
           }
-          
+
           &.is-active {
             color: var(--el-color-primary) !important;
             background-color: #e6f7ff !important;
           }
         }
-        
+
         .el-sub-menu__title {
           color: #333 !important;
-          
+
           &:hover {
             color: var(--el-color-primary) !important;
             background-color: #f5f5f5 !important;
           }
         }
-        
+
         .el-sub-menu.is-active > .el-sub-menu__title {
           color: var(--el-color-primary) !important;
         }
       }
     }
   }
-  
+
   // 紧凑菜单模式
   &.compact-menu {
     .menus {
       width: $mw;
-      
+
       &.is-collapsed {
         width: 64px;
       }
     }
-    
+
     :deep(.el-menu--collapse) {
       width: 64px;
     }
-    
+
     .tech-logo {
       height: 48px;
     }
-    
-    .el-menu-item, :deep(.el-sub-menu__title) {
+
+    .el-menu-item,
+    :deep(.el-sub-menu__title) {
       height: 48px;
       line-height: 48px;
     }
   }
-  
+
   // Logo 区域样式
   .tech-logo {
     height: 60px;
@@ -482,81 +524,81 @@ $mw: 200px;
     align-items: center;
     justify-content: center;
     transition: all 0.3s;
-    
+
     .logo-text {
       font-size: 18px;
       font-weight: 600;
       transition: color 0.3s;
     }
-    
+
     .logo-icon {
       font-size: 20px;
       font-weight: 600;
       transition: color 0.3s;
     }
   }
-  
+
   .menus {
     height: 100%;
     width: $mw;
     position: relative;
     transition: all 0.3s;
     box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
-    
+
     &.is-collapsed {
       width: 64px;
     }
   }
-  
+
   .content {
     flex: 1;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    
+
     .content_top {
       display: flex;
       align-items: center;
-      
+
       .content_top_right {
         flex: 1;
         margin-left: 20px;
       }
-      
+
       .control {
         width: 25px;
         height: 25px;
         cursor: pointer;
       }
-      
+
       .control:hover {
         background-color: #f1f1f1;
       }
-      
+
       .user-dropdown {
         display: flex;
         align-items: center;
         cursor: pointer;
         margin-left: 20px;
-        
+
         .username {
           margin-left: 8px;
         }
       }
-      
+
       // 功能按钮区域样式
       .header-actions {
         display: flex;
         align-items: center;
         margin-right: 10px;
-        
+
         .header-icon {
           font-size: 20px;
           color: #666;
           cursor: pointer;
           margin-right: 16px;
           transition: all 0.3s;
-          
+
           &:hover {
             color: var(--el-color-primary);
             transform: rotate(30deg);
@@ -564,7 +606,7 @@ $mw: 200px;
         }
       }
     }
-    
+
     .content_btm {
       padding: 17px;
       box-sizing: border-box;
@@ -592,4 +634,3 @@ $mw: 200px;
   background: rgba(0, 0, 0, 0.1);
 }
 </style>
-

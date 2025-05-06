@@ -161,11 +161,8 @@ const getMenuList = async () => {
   loading.value = true; // 开始加载
   try {
     const res = await menuList();
-    console.log(res.data, "====>menuList");
     tableData.value = res.data;
-    console.log(tableData, "tableData");
   } catch (error) {
-    console.log(error);
     return [];
   } finally {
     loading.value = false; // 加载完成

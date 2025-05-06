@@ -121,6 +121,7 @@ declare namespace SYSTEM {
         name?: string,
         sortValue?: number,
         status?: number,
+        icon?: string,
         children?: menu[]
     }
 }

@@ -70,7 +70,7 @@ const updateRouter = (route: RouteRecordRaw) => {
 
 //前置路由导航守卫，用来根据用户刷新路由
 router.beforeEach(async (to, from, next) => {
-  const hasToken = userStore.token;
+  const hasToken = userStore.getToken;
   console.log('hasToken:', hasToken);
 
   // 1. 没有token的情况

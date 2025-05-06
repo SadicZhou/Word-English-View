@@ -9,7 +9,7 @@ export const useUserStore = defineStore('userStore', {
             this.token = token
             localStorage.setItem("token", token)
         },
-        removeToken() {
+        async removeToken() {
             this.token = ""
             localStorage.removeItem("token")
         }
@@ -19,6 +19,8 @@ export const useUserStore = defineStore('userStore', {
         formateToken(): string {
             return "Bearer " + this.token
         },
-
+        getToken(): string {
+            return this.token
+        },
     }
 })
