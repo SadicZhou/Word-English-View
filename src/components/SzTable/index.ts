@@ -10,4 +10,4 @@ export default {
     }
 };
 
-export { SzTable as DsButton }; ``
+export { SzTable as DsButton };

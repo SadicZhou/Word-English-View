@@ -125,6 +125,7 @@
         <el-upload
           class="avatar-uploader"
           action="http://localhost:3000/admin/system/file/upload"
+           :headers="headers"
           :show-file-list="false"
           :on-success="handleAvatarSuccess"
           :before-upload="beforeAvatarUpload"
@@ -227,7 +228,9 @@ import { HOOKS } from "@/hooks";
 const userFormRef = ref();
 const pageSize = ref(10);
 const hasSelection = ref(false);
-
+const headers = ref({
+  token: `${localStorage.getItem("token")}`,
+});
 const handleAvatarSuccess = (response: RES.response<string>) => {
   user.avatar = response.data;
 };

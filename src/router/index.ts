@@ -34,7 +34,7 @@ const router = createRouter({
  * 添加动态路由
  * @param {RouteRecordRaw} route - 要添加的路由配置
  */
-const updateRouter = (route: RouteRecordRaw) => {
+export const updateRouter = (route: RouteRecordRaw) => {
   // 先移除所有动态添加的路由
   try {
     router.getRoutes().forEach(r => {
@@ -68,68 +68,97 @@ const updateRouter = (route: RouteRecordRaw) => {
   }
 }
 
-//前置路由导航守卫，用来根据用户刷新路由
+/**
+ * 前置路由导航守卫，用来根据用户刷新路由
+ */
 router.beforeEach(async (to, from, next) => {
   const hasToken = userStore.getToken;
-  console.log('hasToken:', hasToken);
+  console.log('路由守卫执行 - hasToken:', hasToken, '目标路径:', to.path);
 
   // 1. 没有token的情况
   if (!hasToken) {
     // 如果访问的不是登录页，重定向到登录页
     if (to.path !== '/login') {
+      console.log('无token，重定向到登录页');
       next('/login');
     } else {
       // 访问登录页，直接放行
       next();
     }
-    return; // 确保后续代码不执行
+    return;
   }
 
   // 2. 有token的情况
 
   // 2.1 已登录用户访问登录页，重定向到首页
   if (to.path === '/login') {
+    console.log('已登录用户访问登录页，重定向到首页');
     next('/');
     return;
   }
-  // 2.2 判断是否已加载动态路由
-  if (!hasAddedRoutes) {
-    try {
-      // 获取并添加动态路由
-      await PermissonStore.getDynamicRoue();
 
-      // 检查是否成功获取到路由
-      if (PermissonStore.dynamicRoues && PermissonStore.dynamicRoues.children && PermissonStore.dynamicRoues.children.length > 0) {
+  // 2.2 检查是否已加载动态路由
+  if (!PermissonStore.getHasLoadedRoutes) {
+    console.log('动态路由未加载，开始获取...');
+
+    // 如果正在加载中，等待加载完成
+    if (PermissonStore.getIsLoading) {
+      console.log('动态路由正在加载中，等待...');
+      // 可以添加一个简单的等待逻辑或者直接返回
+      next('/login'); // 或者显示加载页面
+      return;
+    }
+
+    try {
+      // 获取动态路由
+      const success = await PermissonStore.getDynamicRoue();
+
+      if (success && PermissonStore.dynamicRoues && PermissonStore.dynamicRoues.children && PermissonStore.dynamicRoues.children.length > 0) {
+        console.log('动态路由获取成功，更新路由表');
         updateRouter(PermissonStore.dynamicRoues);
-        hasAddedRoutes = true;
 
         // 如果访问的是根路径，重定向到默认页面
         if (to.path === '/') {
           // 获取第一个子路由作为默认路由
           const defaultRoute = PermissonStore.dynamicRoues.children[0]?.path || '/system/user';
+          console.log('根路径重定向到:', defaultRoute);
           next(defaultRoute);
         } else {
           // 添加路由后，需要重新导航到目标页面，否则可能会404
+          console.log('重新导航到目标页面:', to.path);
           next({ ...to, replace: true });
         }
       } else {
-        console.error('获取动态路由失败: 返回的路由数据为空');
+        console.error('获取动态路由失败: 返回的路由数据为空或加载失败');
+        // 清除无效的token和缓存
+        userStore.token = '';
+        localStorage.removeItem('token');
+        PermissonStore.clearCache();
         next('/login');
       }
     } catch (error) {
-      console.error('获取动态路由失败:', error);
-      // 获取失败时清除token，避免死循环
+      console.error('获取动态路由异常:', error);
+      // 获取失败时清除token和缓存，避免死循环
       userStore.token = '';
       localStorage.removeItem('token');
+      PermissonStore.clearCache();
       next('/login');
     }
     return;
   }
 
   // 2.3 已加载动态路由，正常放行
+  console.log('动态路由已加载，正常放行');
   next();
 });
 
+/**
+ * 初始化路由
+ * @param {App<Element>} app - Vue应用实例
+ */
 export const initRouter = (app: App<Element>) => {
   app.use(router)
 }
+
+// 导出路由实例
+export default router
