@@ -28,7 +28,7 @@ export const useUserStore = defineStore('userStore', {
          * 用户登出，清理所有相关数据
          */
         async logout() {
-            // 清除token
+            // 先清除token，确保路由守卫能立即检测到
             this.token = "";
             localStorage.removeItem("token");
 
@@ -36,9 +36,9 @@ export const useUserStore = defineStore('userStore', {
             localStorage.removeItem("username");
             localStorage.removeItem("avatar");
 
-            // 清理权限相关缓存
+            // 清理权限相关缓存 - 等待完成以确保清理彻底
             const permissionStore = usePermissonStore();
-            permissionStore.resetRoutes();
+            await permissionStore.resetRoutes();
 
             console.log('用户登出，所有缓存已清理');
         }

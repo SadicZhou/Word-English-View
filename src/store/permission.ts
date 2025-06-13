@@ -14,11 +14,12 @@ export const usePermissonStore = defineStore("PermissonStore", {
     actions: {
         /**
          * 获取动态路由菜单数据
+         * @param {boolean} forceRefresh - 是否强制刷新，忽略缓存
          * @returns {Promise<boolean>} 返回是否成功获取路由
          */
-        async getDynamicRoue(): Promise<boolean> {
-            // 如果已经加载过路由，直接返回成功
-            if (this.hasLoadedRoutes && this.menus.length > 0) {
+        async getDynamicRoue(forceRefresh: boolean = false): Promise<boolean> {
+            // 如果不是强制刷新且已经加载过路由，直接返回成功
+            if (!forceRefresh && this.hasLoadedRoutes && this.menus.length > 0) {
                 console.log('动态路由已缓存，直接使用缓存数据');
                 return true;
             }
@@ -120,6 +121,58 @@ export const usePermissonStore = defineStore("PermissonStore", {
         },
 
         /**
+         * 强制刷新路由，用于登录后获取最新路由（忽略所有缓存）
+         * @returns {Promise<boolean>} 返回是否刷新成功
+         */
+        async forceRefreshRoutes(): Promise<boolean> {
+            try {
+                console.log('强制刷新路由开始（忽略所有缓存）...');
+
+                // 清除所有缓存和状态
+                this.clearCache();
+                this.isLoading = false;
+
+                // 强制重新请求接口
+                this.isLoading = true;
+                const res = await dynamicRoue();
+                const { data, code, message } = res;
+
+                if (code == Code.SUCCESS_CODE && message == Code.SUCCESS) {
+                    console.log('强制获取动态路由成功:', data);
+
+                    // 修正菜单路径后再赋值
+                    this.menus = this.fixMenuPaths(data);
+                    this.dynamicRoues = this.getGenerateRoutes();
+                    this.hasLoadedRoutes = true;
+
+                    // 更新路由表
+                    const { updateRouter } = await import('@/router/index');
+                    updateRouter(this.dynamicRoues);
+
+                    // 更新缓存
+                    try {
+                        localStorage.setItem('cached_menus', JSON.stringify(data));
+                        localStorage.setItem('menus_cache_time', Date.now().toString());
+                    } catch (error) {
+                        console.warn('缓存菜单数据失败:', error);
+                    }
+
+                    console.log('强制刷新路由成功，路由表已更新');
+                    return true;
+                } else {
+                    console.error('强制获取动态路由失败:', message);
+                    throw new Error(`获取菜单失败: ${message}`);
+                }
+            } catch (error) {
+                console.error('强制刷新路由异常:', error);
+                this.hasLoadedRoutes = false;
+                return false;
+            } finally {
+                this.isLoading = false;
+            }
+        },
+
+        /**
          * 从本地缓存加载菜单数据
          * @returns {boolean} 是否成功从缓存加载
          */
@@ -162,12 +215,28 @@ export const usePermissonStore = defineStore("PermissonStore", {
             this.dynamicRoues = {} as RouteRecordRaw;
         },
 
-        /**
+                /**
          * 重置路由状态（用于用户登出时清理）
          */
-        resetRoutes() {
+        async resetRoutes() {
             this.clearCache();
             this.isLoading = false;
+
+            // 清理动态路由（需要异步导入避免循环依赖）
+            try {
+                const { updateRouter } = await import('@/router/index');
+                // 传入空的路由配置来清理动态路由
+                const emptyRoute = {
+                    path: "/",
+                    name: 'Layout',
+                    component: () => import('@/views/Layout/index.vue'),
+                    children: []
+                };
+                updateRouter(emptyRoute);
+                console.log('动态路由已清理');
+            } catch (error) {
+                console.error('清理动态路由失败:', error);
+            }
         },
 
         /**

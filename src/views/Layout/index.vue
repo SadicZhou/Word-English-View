@@ -1,7 +1,10 @@
 <template>
+  <!-- 加载进度条 -->
+  <LoadingBar ref="loadingBarRef" />
+
   <div class="layout" :class="[
-      themeStore.menuTheme === 'light' ? 'light-menu' : 'dark-menu',
-      themeStore.compactMenu ? 'compact-menu' : '',
+  themeStore.menuTheme === 'light' ? 'light-menu' : 'dark-menu',
+  themeStore.compactMenu ? 'compact-menu' : '',
 ]">
     <!-- 左侧菜单 -->
     <div class="menus" :class="{ 'is-collapsed': isCollapse }">
@@ -74,7 +77,7 @@
           <div class="content_top_right">
             <!-- 面包屑导航 -->
             <el-breadcrumb separator="/">
-              <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+              <!-- <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item> -->
               <el-breadcrumb-item v-for="(item, index) in breadcrumbList" :key="index">
                 {{ item.title }}
               </el-breadcrumb-item>
@@ -100,7 +103,8 @@
               <el-dropdown-menu>
                 <el-dropdown-item command="profile">个人信息</el-dropdown-item>
                 <el-dropdown-item command="password">修改密码</el-dropdown-item>
-                <el-dropdown-item command="refresh">刷新路由</el-dropdown-item>
+                <el-dropdown-item command="refresh">刷新页面</el-dropdown-item>
+                <el-dropdown-item command="refreshRoutes">刷新路由</el-dropdown-item>
                 <el-dropdown-item divided command="logout">退出登录</el-dropdown-item>
               </el-dropdown-menu>
             </template>
@@ -108,10 +112,12 @@
         </div>
       </el-card>
       <div class="content_btm">
-        <router-view v-slot="{ Component }">
-          <keep-alive>
-            <component :is="Component" />
-          </keep-alive>
+        <router-view v-slot="{ Component, route }">
+          <transition :name="transitionName" mode="out-in" appear>
+            <div :key="routeKey" class="route-wrapper">
+              <component :is="Component" />
+            </div>
+          </transition>
         </router-view>
       </div>
     </div>
@@ -147,8 +153,8 @@ import {
   Histogram,
 } from "@element-plus/icons-vue";
 import { ElMessage, ElMessageBox } from "element-plus";
-import { Component } from "vue";
 import ThemeSettings from "@/components/ThemeSettings/index.vue";
+import LoadingBar from "@/components/LoadingBar/index.vue";
 
 // 导入图片
 const open = require("@/assets/open_menu.png");
@@ -164,8 +170,20 @@ const router = useRouter();
 // 主题设置抽屉引用
 const themeSettingsRef = ref();
 
+// 加载进度条引用
+const loadingBarRef = ref();
+
 // 菜单折叠状态
 const isCollapse = ref(false);
+
+// 路由切换动画名称
+const transitionName = ref('fade-slide');
+
+// 路由key，确保每次路由变化都重新渲染组件
+const routeKey = computed(() => {
+  // 使用fullPath确保每次路由变化（包括查询参数）都重新渲染
+  return route.fullPath;
+});
 
 // 用户信息
 const userInfo = reactive({
@@ -216,12 +234,12 @@ const breadcrumbList = computed(() => {
 /**
  * 根据菜单图标名称获取对应的图标组件
  * @param {string | undefined} iconName - 菜单图标名称
- * @returns {Component} 图标组件
+ * @returns {any} 图标组件
  */
-const getMenuIcon = (iconName: string | undefined): Component => {
+const getMenuIcon = (iconName: string | undefined): any => {
   if (!iconName) return IconMenu;
 
-  const iconMap: Record<string, Component> = {
+  const iconMap: Record<string, any> = {
     setting: Setting,
     menu: IconMenu,
     user: User,
@@ -255,6 +273,23 @@ const toggleCollapse = () => {
 };
 
 /**
+ * 切换路由动画效果
+ * @param {string} animationType - 动画类型
+ */
+const changeTransition = (animationType: string) => {
+  transitionName.value = animationType;
+  localStorage.setItem('routeTransition', animationType);
+};
+
+/**
+ * 强制刷新当前页面
+ */
+const forceRefreshCurrentPage = () => {
+  // 简单的刷新方法：重新加载页面
+  window.location.reload();
+};
+
+/**
  * 处理下拉菜单命令
  */
 const handleCommand = async (command: string) => {
@@ -265,12 +300,20 @@ const handleCommand = async (command: string) => {
       type: "warning",
     })
       .then(async () => {
-        // 使用新的logout方法，清理所有相关数据
-        await userStore.logout();
+        try {
+          // 使用新的logout方法，清理所有相关数据
+          await userStore.logout();
 
-        // 跳转到登录页
-        router.push("/login");
-        ElMessage.success("退出登录成功");
+          // 确保状态更新完成后再跳转
+          setTimeout(async () => {
+            // 跳转到登录页
+            await router.push("/login");
+            ElMessage.success("退出登录成功");
+          }, 100);
+        } catch (error) {
+          console.error('退出登录失败:', error);
+          ElMessage.error("退出登录失败，请重试");
+        }
       })
       .catch(() => {});
   } else if (command === "profile") {
@@ -278,6 +321,11 @@ const handleCommand = async (command: string) => {
   } else if (command === "password") {
     ElMessage.info("修改密码功能开发中");
   } else if (command === "refresh") {
+    // 刷新当前页面
+    forceRefreshCurrentPage();
+    ElMessage.success('页面刷新成功');
+  } else if (command === "refreshRoutes") {
+    // 刷新路由配置
     try {
       await permissionStore.refreshRoutes(true);
     } catch (error) {
@@ -310,6 +358,12 @@ onMounted(async () => {
     isCollapse.value = savedCollapsed === "true";
   }
 
+  // 从localStorage恢复路由动画类型
+  const savedTransition = localStorage.getItem("routeTransition");
+  if (savedTransition) {
+    transitionName.value = savedTransition;
+  }
+
   // 清除缓存确保路径修正生效（临时措施）
   permissionStore.clearCache();
 
@@ -317,10 +371,20 @@ onMounted(async () => {
   await fetchMenuData();
 });
 
-// 监听路由变化，更新激活的菜单
+// 监听路由变化，更新激活的菜单并控制进度条
 watch(
-  () => route.path,
-  (newPath) => {
+  () => route.fullPath, // 使用 fullPath 而不是 path，这样查询参数变化也会触发
+  (newPath, oldPath) => {
+    // 如果是不同的路径才显示进度条
+    if (newPath !== oldPath && oldPath) {
+      // 开始进度条
+      loadingBarRef.value?.start();
+
+      // 模拟路由切换完成，结束进度条
+      setTimeout(() => {
+        loadingBarRef.value?.finish();
+      }, 300);
+    }
   },
   { immediate: true }
 );
@@ -593,5 +657,67 @@ $mw: 200px;
 
 :deep(.el-menu-vertical-demo::-webkit-scrollbar-track) {
   background: rgba(0, 0, 0, 0.1);
+}
+// 路由切换动画样式
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.fade-slide-enter-from {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateX(-30px);
+}
+
+// 滑动淡入动画（备选）
+.slide-fade-enter-active,
+.slide-fade-leave-active {
+  transition: all 0.3s ease-out;
+}
+
+.slide-fade-enter-from {
+  transform: translateX(100%);
+  opacity: 0;
+}
+
+.slide-fade-leave-to {
+  transform: translateX(-100%);
+  opacity: 0;
+}
+
+// 缩放淡入动画（备选）
+.scale-fade-enter-active,
+.scale-fade-leave-active {
+  transition: all 0.25s ease;
+}
+
+.scale-fade-enter-from {
+  opacity: 0;
+  transform: scale(0.95);
+}
+
+.scale-fade-leave-to {
+  opacity: 0;
+  transform: scale(1.05);
+}
+
+// 为路由切换区域添加相对定位，确保动画正常
+.content_btm {
+  position: relative;
+
+  >* {
+    width: 100%;
+  }
+
+  // 路由包装器样式
+  .route-wrapper {
+    width: 100%;
+    height: 100%;
+  }
 }
 </style>

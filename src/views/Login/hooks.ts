@@ -24,11 +24,22 @@ export function useLogin() {
                 const { data, message } = res;
                 ElMessage.success(message);
 
-                // 清理旧的路由缓存，让路由守卫重新获取
+                // 强制清理所有缓存，确保重新获取最新路由
                 permissionStore.clearCache();
 
-                // 跳转首页，路由守卫会自动处理动态路由加载
-                router.push("/");
+                // 强制重新获取路由数据（不使用任何缓存）
+                console.log('登录成功，强制重新获取最新路由...');
+                const routeSuccess = await permissionStore.forceRefreshRoutes();
+
+                if (routeSuccess) {
+                    console.log('路由获取成功，跳转首页');
+                    // 跳转首页
+                    router.push("/");
+                } else {
+                    console.error('获取路由失败，但仍然跳转首页，让路由守卫处理');
+                    // 如果强制获取失败，仍然跳转，让路由守卫处理
+                    router.push("/");
+                }
             } else {
                 ElMessage.error(res.message);
             }

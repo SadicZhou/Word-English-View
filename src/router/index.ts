@@ -68,12 +68,43 @@ export const updateRouter = (route: RouteRecordRaw) => {
   }
 }
 
+// 进度条控制（在路由守卫中使用）
+let isShowingProgress = false;
+
+/**
+ * 开始显示进度条
+ */
+const startProgress = () => {
+  if (!isShowingProgress) {
+    isShowingProgress = true;
+    // 这里可以触发全局进度条，如果需要的话
+  }
+};
+
+/**
+ * 结束进度条
+ */
+const finishProgress = () => {
+  if (isShowingProgress) {
+    isShowingProgress = false;
+    // 这里可以结束全局进度条，如果需要的话
+  }
+};
+
 /**
  * 前置路由导航守卫，用来根据用户刷新路由
  */
 router.beforeEach(async (to, from, next) => {
-  const hasToken = userStore.getToken;
-  console.log('路由守卫执行 - hasToken:', hasToken, '目标路径:', to.path);
+  // 开始进度条（当从一个页面导航到另一个页面时）
+  if (from.path !== to.path) {
+    startProgress();
+  }
+  // 同时检查 store 和 localStorage，确保数据一致性
+  const storeToken = userStore.token;
+  const localToken = localStorage.getItem('token');
+  const hasToken = storeToken && localToken;
+
+  console.log('路由守卫执行 - storeToken:', storeToken, 'localToken:', localToken, '目标路径:', to.path);
 
   // 1. 没有token的情况
   if (!hasToken) {
@@ -104,8 +135,8 @@ router.beforeEach(async (to, from, next) => {
     // 如果正在加载中，等待加载完成
     if (PermissonStore.getIsLoading) {
       console.log('动态路由正在加载中，等待...');
-      // 可以添加一个简单的等待逻辑或者直接返回
-      next('/login'); // 或者显示加载页面
+      // 等待一段时间后重试，避免阻塞
+      setTimeout(() => next({ ...to, replace: true }), 500);
       return;
     }
 
@@ -150,6 +181,14 @@ router.beforeEach(async (to, from, next) => {
   // 2.3 已加载动态路由，正常放行
   console.log('动态路由已加载，正常放行');
   next();
+});
+
+/**
+ * 后置路由导航守卫，用来结束进度条
+ */
+router.afterEach((to, from) => {
+  // 结束进度条
+  finishProgress();
 });
 
 /**
