@@ -79,18 +79,28 @@
         <el-input v-model="menu.title" autocomplete="off" placeholder="请输入菜单标题" />
       </el-form-item>
 
+      <!-- 菜单类型选择 - 只在新增时显示 -->
+      <el-form-item label="菜单类型" prop="menuType" v-bind="{ ...formItemConfig }"
+        v-if="title === '新增菜单' || title === '添加子菜单'">
+        <el-radio-group v-model="menu.type">
+          <el-radio label="1">菜单</el-radio>
+          <el-radio label="0">目录</el-radio>
+        </el-radio-group>
+      </el-form-item>
+
       <!-- <el-form-item label="路由名称" prop="name" v-bind="{ ...formItemConfig }">
         <el-input v-model="menu.name" autocomplete="off" placeholder="请输入路由名称" />
       </el-form-item> -->
 
-      <el-form-item label="组件路径" prop="component" v-bind="{ ...formItemConfig }">
+      <!-- 组件路径 - 只在菜单类型为'menu'时显示 -->
+      <el-form-item label="组件路径" prop="component" v-bind="{ ...formItemConfig }" v-if="menu.type == '1'">
         <el-input v-model="menu.component" autocomplete="off" placeholder="请输入组件路径" @blur="handleComponentInput">
           <template #prepend>@/views/</template>
           <template #append>.vue</template>
         </el-input>
       </el-form-item>
 
-      <el-form-item label="路由地址" v-if="menu.parentId != 0" prop="path" v-bind="{ ...formItemConfig }">
+      <el-form-item label="路由地址" v-if="menu.type == '1'" prop="path" v-bind="{ ...formItemConfig }">
         <el-input v-model="menu.path" autocomplete="off" placeholder="请输入路由地址，如：/system/menu" />
       </el-form-item>
 
@@ -137,7 +147,7 @@ import {
   Check, CircleCheck, Close, Download, Upload, Warning, InfoFilled,
   SuccessFilled, QuestionFilled, ArrowDown, ArrowUp, ArrowLeft, ArrowRight
 } from "@element-plus/icons-vue";
-import { onMounted, reactive, ref } from "vue";
+import { onMounted, reactive, ref, watch } from "vue";
 import { deleteById, save, update } from "@/service/menu"
 import { pageNationConfig } from "@/config/pageConfig";
 import { cardPad } from "@/config/cardConfig";
@@ -177,7 +187,8 @@ const menu = reactive<SYSTEM.menu>({
   sortValue: 1,
   parentId: 0,
   path: '',
-  icon: ''
+  icon: '',
+  type: '0' // 新增菜单类型字段：'menu'=菜单，'directory'=目录
 });
 
 // 当前编辑的父级菜单信息（用于添加子菜单时显示）
@@ -195,7 +206,13 @@ const formRules = {
     { required: true, message: '请输入路由名称', trigger: 'blur' }
   ],
   component: [
-    { required: true, message: '请输入组件路径', trigger: 'blur' }
+    {
+      required: function () {
+        return menu.type === '1'; // 只有菜单类型为'menu'时才必填
+      },
+      message: '请输入组件路径',
+      trigger: 'blur'
+    }
   ],
   path: [
     { required: true, message: '请输入路由地址', trigger: 'blur' }
@@ -205,6 +222,9 @@ const formRules = {
   ],
   status: [
     { required: true, message: '请选择状态', trigger: 'change' }
+  ],
+  menuType: [
+    { required: true, message: '请选择菜单类型', trigger: 'change' }
   ]
 };
 
@@ -256,6 +276,7 @@ const getMenuList = async () => {
  * 编辑菜单 - 回显所有数据（除了id和创建时间）
  */
 const updateClick = (row: SYSTEM.menu) => {
+  console.log(row);
   title.value = "菜单详情";
 
   // 回显所有字段数据
@@ -268,6 +289,7 @@ const updateClick = (row: SYSTEM.menu) => {
   menu.status = row.status !== undefined ? row.status : 1;
   menu.sortValue = row.sortValue !== undefined ? row.sortValue : 1;
   menu.parentId = row.parentId !== undefined ? row.parentId : 0;
+  menu.type = row.type || '0'; // 回显菜单类型，默认为菜单
 
   // 清空父级菜单信息
   parentMenuInfo.value = null;
@@ -287,6 +309,7 @@ const restForm = () => {
   menu.status = 1;
   menu.sortValue = 1;
   menu.parentId = 0;
+  menu.type = '0'; // 重置菜单类型为默认值
   parentMenuInfo.value = null;
 };
 
@@ -611,6 +634,14 @@ const fixMenuData = async () => {
     ElMessage.error('修复菜单数据失败');
   }
 };
+
+// 监听菜单类型变化
+watch(() => menu.type, (newType) => {
+  // 当选择目录类型时，清空组件路径
+  if (newType === '0') {
+    menu.component = '';
+  }
+});
 
 onMounted(() => {
   getMenuList();

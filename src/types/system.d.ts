@@ -110,6 +110,7 @@ declare namespace SYSTEM {
      * @param {string} component -组件名
      * @param {number} sortValue -排序
      * @param {number} status -状态(0:禁止,1:正常)
+     * @param {string} type -菜单类型(1:菜单,0:目录)
      * @param {Array}  children -子节点
      */
     interface menu {
@@ -122,6 +123,29 @@ declare namespace SYSTEM {
         sortValue?: number,
         status?: number,
         icon?: string,
+        type?: string,
         children?: menu[]
+    }
+
+    /**
+     * @description 部门信息
+     * @param {number | string} id -部门ID
+     * @param {string} name -部门名称
+     * @param {number} parentId -上级部门id
+     * @param {number} sortValue -排序
+     * @param {number} status -状态(0:正常,1:停用)
+     * @param {string} remark -描述
+     * @param {string} createTime -创建时间
+     * @param {Array} children -子部门
+     */
+    interface department {
+        id?: number | string,
+        name: string,
+        parentId?: number,
+        sortValue?: number,
+        status?: number,
+        remark?: string,
+        createTime?: string,
+        children?: department[]
     }
 }
