@@ -46,7 +46,7 @@
     <!-- 分页区域 -->
     <div class="pagination-container">
       <el-pagination background layout="total, sizes, prev, pager, next, jumper" :total="totalNum"
-        :page-sizes="[10, 20, 50, 100]" v-model:current-page="current" v-model:page-size="pageSize"
+        :page-sizes="pageNationConfig.pageSizes" v-model:current-page="current" v-model:page-size="pageSize"
         @size-change="handleSizeChange" @current-change="handleCurrentChange" />
     </div>
   </div>
@@ -344,5 +344,12 @@ onMounted(() => {
       }
     }
   }
+                                // 分页容器样式
+                                .pagination-container {
+                                  display: flex;
+                                  justify-content: center;
+                                  padding: 20px;
+                                  border-radius: 6px;
+                                }
 }
 </style>

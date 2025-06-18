@@ -209,7 +209,9 @@ onMounted(() => {
     // 分页容器样式
     .pagination-container {
         display: flex;
-        justify-content: flex-end;
+        justify-content: center;
+            padding: 20px;
+            border-radius: 6px;
     }
 }
 

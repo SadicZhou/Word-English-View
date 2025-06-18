@@ -472,7 +472,6 @@ onMounted(() => {
 .pagination-container {
     display: flex;
     justify-content: center;
-    background: white;
     padding: 20px;
     border-radius: 6px;
 }

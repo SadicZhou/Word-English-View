@@ -6,6 +6,15 @@
                 <el-form-item label="课程名称">
                     <el-input v-model="queryParams.courseName" style="width: 200px" placeholder="请输入课程名称" clearable />
                 </el-form-item>
+                <el-form-item label="所属校区">
+                    <el-select v-model="queryParams.campus" style="width: 200px" placeholder="请选择所属校区" clearable>
+                        <el-option label="全部" value="" />
+                        <el-option label="北京校区" value="北京校区" />
+                        <el-option label="上海校区" value="上海校区" />
+                        <el-option label="广州校区" value="广州校区" />
+                        <el-option label="深圳校区" value="深圳校区" />
+                    </el-select>
+                </el-form-item>
                 <el-form-item label="授课老师">
                     <el-input v-model="queryParams.teacher" style="width: 200px" placeholder="请输入授课老师" clearable />
                 </el-form-item>
@@ -67,6 +76,10 @@
                     <span class="label">课程类型：</span>
                     <span class="value">{{ detailData.courseType }}</span>
                 </div>
+                <div class="detail-item">
+                    <span class="label">所属校区：</span>
+                    <span class="value">{{ detailData.campus }}</span>
+                </div>
             </div>
         </div>
     </el-dialog>
@@ -86,6 +99,7 @@ const currentDate = ref(new Date())
 // 查询参数
 const queryParams = reactive({
     courseName: '',
+    campus: '',
     teacher: '',
     classroom: '',
     status: '',
@@ -97,46 +111,147 @@ const courseData = ref([
     {
         id: 1,
         title: '商务英语基础语法（一）',
-        teacher: '1237832张兰',
+        teacher: '张兰',
         time: '10:10',
-        fullTime: '2025-10-01 10:10:00',
+        fullTime: '2025-06-15 10:10:00',
         classroom: '302教室',
         courseType: '商务英语',
+        campus: '北京校区',
         status: '待上课',
-        date: '2025-01-15'
+        date: '2025-06-15'
     },
     {
         id: 2,
         title: '雅思实战演练03',
-        teacher: '1237832张兰',
+        teacher: '张兰',
         time: '14:30',
-        fullTime: '2025-10-01 14:30:00',
+        fullTime: '2025-06-15 14:30:00',
         classroom: '301教室',
         courseType: '雅思',
+        campus: '北京校区',
         status: '待上课',
-        date: '2025-01-15'
+        date: '2025-06-15'
     },
+    {
+        id: 2,
+        title: '雅思实战演练03',
+        teacher: '张兰',
+        time: '14:30',
+        fullTime: '2025-06-15 14:30:00',
+        classroom: '301教室',
+        courseType: '雅思',
+        campus: '北京校区',
+        status: '待上课',
+        date: '2025-06-15'
+    },
+    {
+        id: 2,
+        title: '雅思实战演练03',
+        teacher: '张兰',
+        time: '14:30',
+        fullTime: '2025-06-15 14:30:00',
+        classroom: '301教室',
+        courseType: '雅思',
+        campus: '北京校区',
+        status: '待上课',
+        date: '2025-06-15'
+    },
+
     {
         id: 3,
         title: '商务英语口语训练',
-        teacher: '1237832李老师',
+        teacher: '李明',
         time: '09:00',
-        fullTime: '2025-10-02 09:00:00',
+        fullTime: '2025-06-16 09:00:00',
         classroom: '303教室',
         courseType: '商务英语',
+        campus: '上海校区',
         status: '已结束',
-        date: '2025-01-16'
+        date: '2025-06-16'
     },
     {
         id: 4,
         title: '雅思听力专项',
-        teacher: '1237832王老师',
+        teacher: '王芳',
         time: '15:00',
-        fullTime: '2025-10-03 15:00:00',
+        fullTime: '2025-06-17 15:00:00',
         classroom: '304教室',
         courseType: '雅思',
+        campus: '广州校区',
         status: '上课中',
-        date: '2025-01-17'
+        date: '2025-06-17'
+    },
+    {
+        id: 5,
+        title: '商务英语写作训练',
+        teacher: '赵强',
+        time: '11:00',
+        fullTime: '2025-06-18 11:00:00',
+        classroom: '305教室',
+        courseType: '商务英语',
+        campus: '深圳校区',
+        status: '待上课',
+        date: '2025-06-18'
+    },
+    {
+        id: 6,
+        title: '雅思阅读技巧',
+        teacher: '陈静',
+        time: '16:30',
+        fullTime: '2025-06-18 16:30:00',
+        classroom: '306教室',
+        courseType: '雅思',
+        campus: '北京校区',
+        status: '待上课',
+        date: '2025-06-18'
+    },
+    {
+        id: 7,
+        title: '商务英语演讲技巧',
+        teacher: '刘华',
+        time: '08:30',
+        fullTime: '2025-06-19 08:30:00',
+        classroom: '307教室',
+        courseType: '商务英语',
+        campus: '上海校区',
+        status: '待上课',
+        date: '2025-06-19'
+    },
+    {
+        id: 8,
+        title: '雅思口语模拟考试',
+        teacher: '周伟',
+        time: '13:00',
+        fullTime: '2025-06-19 13:00:00',
+        classroom: '308教室',
+        courseType: '雅思',
+        campus: '广州校区',
+        status: '已取消',
+        date: '2025-06-19'
+    },
+    {
+        id: 9,
+        title: '商务英语邮件写作',
+        teacher: '吴丽',
+        time: '10:30',
+        fullTime: '2025-06-20 10:30:00',
+        classroom: '309教室',
+        courseType: '商务英语',
+        campus: '深圳校区',
+        status: '待上课',
+        date: '2025-06-20'
+    },
+    {
+        id: 10,
+        title: '雅思写作技巧训练',
+        teacher: '徐磊',
+        time: '14:00',
+        fullTime: '2025-06-20 14:00:00',
+        classroom: '310教室',
+        courseType: '雅思',
+        campus: '北京校区',
+        status: '上课中',
+        date: '2025-06-20'
     }
 ])
 
@@ -193,6 +308,7 @@ const handleQuery = () => {
  */
 const handleReset = () => {
     queryParams.courseName = ''
+    queryParams.campus = ''
     queryParams.teacher = ''
     queryParams.classroom = ''
     queryParams.status = ''
@@ -239,8 +355,8 @@ onMounted(() => {
 
     :deep(.el-calendar-table) {
         .el-calendar-day {
-            height: 120px;
-            padding: 4px;
+            height: 180px;
+            padding: 8px;
         }
     }
 }
@@ -252,26 +368,29 @@ onMounted(() => {
     flex-direction: column;
 
     .date-number {
-        font-size: 14px;
+        font-size: 16px;
         font-weight: bold;
         color: #606266;
-        margin-bottom: 4px;
+        margin-bottom: 8px;
+        text-align: center;
     }
 
     .course-list {
         flex: 1;
-        overflow: hidden;
+        overflow-y: auto;
+        max-height: 140px;
     }
 
     .course-item {
         background: #f0f9ff;
         border: 1px solid #b3d8ff;
         border-radius: 4px;
-        padding: 4px 6px;
-        margin-bottom: 2px;
+        padding: 6px 8px;
+        margin-bottom: 4px;
         cursor: pointer;
         font-size: 12px;
         transition: all 0.3s;
+        min-height: 24px;
 
         &:hover {
             transform: translateY(-1px);

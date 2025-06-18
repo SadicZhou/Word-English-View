@@ -243,6 +243,21 @@ let totalNum = ref(0);
 let loading = ref(false); // 添加 loading 状态
 
 /**
+ * 获取菜单列表
+ */
+const getMenuList = async () => {
+  loading.value = true; // 开始加载
+  try {
+    const res = await menuList();
+    tableData.value = res.data;
+  } catch (error) {
+    return [];
+  } finally {
+    loading.value = false; // 加载完成
+  }
+};
+
+/**
  * 刷新路由和菜单数据
  */
 const refreshRoutes = async () => {
@@ -258,18 +273,6 @@ const refreshRoutes = async () => {
     ElMessage.error('刷新路由失败，请重试');
   } finally {
     loading.value = false;
-  }
-};
-
-const getMenuList = async () => {
-  loading.value = true; // 开始加载
-  try {
-    const res = await menuList();
-    tableData.value = res.data;
-  } catch (error) {
-    return [];
-  } finally {
-    loading.value = false; // 加载完成
   }
 };
 /**

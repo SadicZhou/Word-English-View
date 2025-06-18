@@ -443,7 +443,14 @@ onMounted(() => {
     width: 80px;
     height: 80px;
   }
-}
+                // 分页容器样式
+                .pagination-container {
+                  display: flex;
+                  justify-content: center;
+                  padding: 20px;
+                  border-radius: 6px;
+                }
+                }
 .avatar-uploader .el-upload {
   cursor: pointer;
   position: relative;

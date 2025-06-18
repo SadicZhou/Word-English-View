@@ -10,6 +10,15 @@
                         <el-option label="商务英语" value="商务英语" />
                     </el-select>
                 </el-form-item>
+                <el-form-item label="所属校区">
+                    <el-select v-model="queryParams.campus" style="width: 200px" placeholder="请选择所属校区" clearable>
+                        <el-option label="全部" value="" />
+                        <el-option label="北京校区" value="北京校区" />
+                        <el-option label="上海校区" value="上海校区" />
+                        <el-option label="广州校区" value="广州校区" />
+                        <el-option label="深圳校区" value="深圳校区" />
+                    </el-select>
+                </el-form-item>
                 <el-form-item label="授课老师">
                     <el-input v-model="queryParams.teacher" style="width: 200px" placeholder="请输入授课老师" clearable />
                 </el-form-item>
@@ -46,21 +55,22 @@
         <!-- 表格区域 -->
         <div class="table-container">
             <el-table :data="tableData" v-bind="{ ...tableConfig }" v-loading="loading">
-                <el-table-column prop="id" label="课程ID" width="150" />
+                <el-table-column prop="id" label="课程ID" />
                 <el-table-column prop="courseName" label="课程名称" />
-                <el-table-column prop="courseType" label="课程类型" width="120" />
+                <el-table-column prop="courseType" label="课程类型" />
+                <el-table-column prop="campus" label="所属校区" />
                 <el-table-column prop="teacher" label="授课老师" />
-                <el-table-column prop="status" label="状态" width="100" align="center">
+                <el-table-column prop="status" label="状态">
                     <template #default="{ row }">
                         <el-tag :type="getStatusType(row.status)">
                             {{ row.status }}
                         </el-tag>
                     </template>
                 </el-table-column>
-                <el-table-column prop="classroom" label="教室地点" width="120" />
-                <el-table-column prop="classTime" label="上课时间" width="200" />
+                <el-table-column prop="classroom" label="教室地点" />
+                <el-table-column prop="classTime" label="上课时间" />
                 <el-table-column prop="creator" label="创建人" />
-                <el-table-column prop="createTime" label="创建时间" width="180" />
+                <el-table-column prop="createTime" label="创建时间" />
                 <el-table-column fixed="right" label="操作" width="200" align="center">
                     <template #default="{ row }">
                         <el-button link type="primary" size="small" @click="handleDetail(row)">
@@ -160,6 +170,22 @@
                             <el-option label="商务英语" value="商务英语" />
                         </el-select>
                     </el-form-item>
+                </el-col>
+            </el-row>
+
+            <el-row :gutter="20">
+                <el-col :span="12">
+                    <el-form-item label="所属校区" prop="campus" v-bind="{ ...formItemConfig }">
+                        <el-select v-model="lessonForm.campus" placeholder="请选择所属校区">
+                            <el-option label="北京校区" value="北京校区" />
+                            <el-option label="上海校区" value="上海校区" />
+                            <el-option label="广州校区" value="广州校区" />
+                            <el-option label="深圳校区" value="深圳校区" />
+                        </el-select>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                    <!-- 预留位置 -->
                 </el-col>
             </el-row>
 
@@ -289,6 +315,7 @@ const title = ref('')
 // 查询参数
 const queryParams = reactive({
     courseType: '',
+    campus: '',
     teacher: '',
     status: '',
     createTime: [] as string[]
@@ -300,6 +327,7 @@ const lessonForm = reactive({
     id: '',
     courseName: '',
     courseType: '',
+    campus: '',
     teacher: '',
     classroom: '',
     classTime: [] as string[],
@@ -310,6 +338,7 @@ const lessonForm = reactive({
 const formRules = {
     courseName: [{ required: true, message: '请输入课程名称', trigger: 'blur' }],
     courseType: [{ required: true, message: '请选择课程类型', trigger: 'change' }],
+    campus: [{ required: true, message: '请选择所属校区', trigger: 'change' }],
     teacher: [{ required: true, message: '请输入授课老师', trigger: 'blur' }],
     classroom: [{ required: true, message: '请输入教室地点', trigger: 'blur' }],
     classTime: [{ required: true, message: '请选择上课时间', trigger: 'change' }]
@@ -338,6 +367,7 @@ const tableData = ref([
         id: '87262690176',
         courseName: '雅思基础课程',
         courseType: '雅思',
+        campus: '北京校区',
         teacher: '张兰',
         status: '待审核',
         classroom: '302室',
@@ -349,6 +379,7 @@ const tableData = ref([
         id: '87262690177',
         courseName: '商务英语进阶',
         courseType: '商务英语',
+        campus: '上海校区',
         teacher: '李明',
         status: '已驳回',
         classroom: '303室',
@@ -360,6 +391,7 @@ const tableData = ref([
         id: '87262690178',
         courseName: '雅思口语专项',
         courseType: '雅思',
+        campus: '广州校区',
         teacher: '王芳',
         status: '已通过',
         classroom: '304室',
@@ -371,6 +403,7 @@ const tableData = ref([
         id: '87262690179',
         courseName: '商务英语写作',
         courseType: '商务英语',
+        campus: '深圳校区',
         teacher: '赵强',
         status: '已取消',
         classroom: '305室',
@@ -448,6 +481,7 @@ const handleQuery = () => {
 const handleReset = () => {
     Object.assign(queryParams, {
         courseType: '',
+        campus: '',
         teacher: '',
         status: '',
         createTime: []
@@ -578,6 +612,7 @@ const resetForm = () => {
         id: '',
         courseName: '',
         courseType: '',
+        campus: '',
         teacher: '',
         classroom: '',
         classTime: [],
@@ -742,6 +777,7 @@ onMounted(() => {
         }
     }
 }
+
 // 详情内容样式
 .detail-content {
     .detail-section {
@@ -770,6 +806,13 @@ onMounted(() => {
     }
 }
 
+// 分页容器样式
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+    border-radius: 6px;
+}
 // 对话框样式调整
 :deep(.el-dialog__body) {
     padding: 20px;
