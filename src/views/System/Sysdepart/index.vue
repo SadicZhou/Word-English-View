@@ -261,8 +261,6 @@ const deleteClick = (row: SYSTEM.department) => {
     });
 };
 
-
-
 /**
  * 重置搜索
  */
@@ -280,20 +278,15 @@ onMounted(() => {
   <div class="content">
     <!-- 搜索区域 -->
     <el-card :body-style="cardPad" class="search-card">
-      <el-row>
-        <div class="keyword">关键字</div>
-        <el-col :span="4">
-          <el-input v-model="searchForm.name" style="width: 95%" placeholder="请输入部门名称" :prefix-icon="Search" />
-        </el-col>
-      </el-row>
-      <el-row class="search-buttons">
-        <el-col :span="24">
-          <div class="button-container">
-            <el-button type="primary" :icon="Search" @click="getDepartmentList()">搜索</el-button>
-            <el-button :icon="Refresh" @click="resetSearch">重置</el-button>
-          </div>
-        </el-col>
-      </el-row>
+      <el-form :model="searchForm" :inline="true" label-width="100px">
+        <el-form-item label="部门名称">
+          <el-input v-model="searchForm.name" style="width: 200px" placeholder="请输入部门名称" :prefix-icon="Search" />
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" :icon="Search" @click="getDepartmentList()">搜索</el-button>
+          <el-button :icon="Refresh" @click="resetSearch">重置</el-button>
+        </el-form-item>
+      </el-form>
     </el-card>
 
     <!-- 操作区域 -->
@@ -394,40 +387,6 @@ onMounted(() => {
   // 搜索卡片样式
   .search-card {
     margin-bottom: 20px;
-
-    .keyword {
-      font-weight: bold;
-      font-size: 15px;
-      color: #909399;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin: 0 10px;
-    }
-
-    // 按钮容器样式
-    .button-container {
-      display: flex;
-      justify-content: flex-end; // 按钮靠右对齐
-      margin-top: 15px;
-
-      .el-button {
-        margin-left: 10px; // 按钮之间的间距
-
-        &:first-child {
-          margin-left: 0; // 第一个按钮不需要左边距
-        }
-      }
-    }
-
-    // 为搜索栏中的每个元素添加间距
-    :deep(.el-row) {
-      margin-bottom: 15px;
-
-      &:last-child {
-        margin-bottom: 0;
-      }
-    }
   }
 
   // 操作卡片样式

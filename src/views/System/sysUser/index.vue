@@ -4,41 +4,27 @@
     <el-card :body-style="cardPad" class="search-card">
       <el-row>
         <div class="keyword">关键字</div>
-        <el-col :span="4">
-          <el-input
-            v-model="searchForm.keyword"
-            style="width: 95%"
-            placeholder="请输入关键字"
-            :prefix-icon="Search"
-          />
+        <el-col :span="6">
+          <el-input v-model="searchForm.keyword" style="width: 95%" placeholder="请输入关键字" :prefix-icon="Search" />
         </el-col>
         <div class="keyword">创建时间</div>
-        <el-col :span="4">
+        <el-col :span="8">
           <el-config-provider :locale="lang">
-            <el-date-picker
-              v-model="searchForm.dateRange"
-              type="datetimerange"
-              range-separator="To"
-              start-placeholder="开始时间"
-              end-placeholder="结束时间"
-            />
+            <el-date-picker v-model="searchForm.dateRange" style="width: 95%" type="datetimerange" range-separator="To"
+              start-placeholder="开始时间" end-placeholder="结束时间" />
           </el-config-provider>
         </el-col>
       </el-row>
       <el-row class="search-buttons">
         <el-col :span="24">
           <div class="button-container">
-            <el-button
-              type="primary"
-              :icon="Search"
-              @click="getUserList()"
-            >搜索</el-button>
+            <el-button type="primary" :icon="Search" @click="getUserList()">搜索</el-button>
             <el-button :icon="Refresh" @click="resetSearch">重置</el-button>
           </div>
         </el-col>
       </el-row>
     </el-card>
-    
+
     <!-- 操作区域 -->
     <el-card :body-style="cardPad" class="action-card">
       <el-row>
@@ -47,14 +33,10 @@
         </el-col>
       </el-row>
     </el-card>
-    
+
     <!-- 表格区域 -->
     <div class="table-container">
-      <el-table 
-        :data="tableData" 
-        v-bind="{ ...tableConfig }"
-        v-loading="loading"
-      >
+      <el-table :data="tableData" v-bind="{ ...tableConfig }" v-loading="loading">
         <el-table-column prop="id" label="ID" width="80" />
         <el-table-column prop="userName" label="用户名" />
         <el-table-column prop="name" label="姓名" />
@@ -76,62 +58,34 @@
         </el-table-column>
         <el-table-column fixed="right" label="操作" width="220" align="center">
           <template #default="{ row }">
-            <el-button
-              link
-              type="primary"
-              size="small"
-              @click="updateClick(row)"
-            >
+            <el-button link type="primary" size="small" @click="updateClick(row)">
               修改
             </el-button>
-            <el-button
-              link
-              type="danger"
-              size="small"
-              @click="deleteClick(row)"
-              >删除</el-button
-            >
-            <el-button
-              link
-              type="success"
-              size="small"
-              @click="assigningRoles(row)"
-              >分配角色</el-button
-            >
+            <el-button link type="danger" size="small" @click="deleteClick(row)">删除</el-button>
+            <el-button link type="success" size="small" @click="assigningRoles(row)">分配角色</el-button>
           </template>
         </el-table-column>
       </el-table>
     </div>
-    
+
     <!-- 分页区域 -->
     <div class="pagination-container">
-      <el-pagination
-        background
-        layout="total, sizes, prev, pager, next, jumper"
-        :total="totalNum"
-        :page-sizes="pageNationConfig.pageSizes"
-        v-model:current-page="current"
-        v-model:page-size="pageSize"
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-      />
+      <el-pagination background layout="total, sizes, prev, pager, next, jumper" :total="totalNum"
+        :page-sizes="pageNationConfig.pageSizes" v-model:current-page="current" v-model:page-size="pageSize"
+        @size-change="handleSizeChange" @current-change="handleCurrentChange" />
     </div>
   </div>
-  
+
   <!-- 新增/修改用户对话框 -->
   <el-dialog v-model="dialogShow" width="500" :title="title" destroy-on-close>
     <el-form :model="user" v-bind="{ ...formConfig }" ref="userFormRef">
       <el-form-item label="头像" v-bind="{ ...formItemConfig }">
-        <el-upload
-          class="avatar-uploader"
-          action="http://localhost:3000/admin/system/file/upload"
-           :headers="headers"
-          :show-file-list="false"
-          :on-success="handleAvatarSuccess"
-          :before-upload="beforeAvatarUpload"
-        >
+        <el-upload class="avatar-uploader" action="http://localhost:3000/admin/system/file/upload" :headers="headers"
+          :show-file-list="false" :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload">
           <img v-if="user.avatar" :src="user.avatar" class="avatar" />
-          <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
+          <el-icon v-else class="avatar-uploader-icon">
+            <Plus />
+          </el-icon>
         </el-upload>
       </el-form-item>
       <el-form-item label="用户名" v-bind="{ ...formItemConfig }">
@@ -140,17 +94,8 @@
       <el-form-item label="昵称" v-bind="{ ...formItemConfig }">
         <el-input v-model="user.name" autocomplete="off" />
       </el-form-item>
-      <el-form-item
-        v-if="title == '新增用户'"
-        label="密码"
-        v-bind="{ ...formItemConfig }"
-      >
-        <el-input
-          type="password"
-          show-password
-          v-model="user.password"
-          autocomplete="off"
-        />
+      <el-form-item v-if="title == '新增用户'" label="密码" v-bind="{ ...formItemConfig }">
+        <el-input type="password" show-password v-model="user.password" autocomplete="off" />
       </el-form-item>
       <el-form-item label="手机号码" v-bind="{ ...formItemConfig }">
         <el-input v-model="user.phone" autocomplete="off" />
@@ -162,12 +107,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="描述" v-bind="{ ...formItemConfig }">
-        <el-input
-          v-model="user.description"
-          autocomplete="off"
-          :rows="2"
-          type="textarea"
-        />
+        <el-input v-model="user.description" autocomplete="off" :rows="2" type="textarea" />
       </el-form-item>
     </el-form>
     <template #footer>
@@ -177,7 +117,7 @@
       </div>
     </template>
   </el-dialog>
-  
+
   <!-- 分配角色对话框 -->
   <el-dialog v-model="assainRoleDialog" width="500" :title="title" destroy-on-close>
     <el-form :model="userRole">
@@ -186,12 +126,7 @@
       </el-form-item>
       <el-form-item label="角色" v-bind="{ ...formItemConfig }">
         <el-checkbox-group v-model="userRole.roleList">
-          <el-checkbox
-            v-for="item in boxList"
-            :key="item.id"
-            :label="item.roleName"
-            :value="item.id"
-          />
+          <el-checkbox v-for="item in boxList" :key="item.id" :label="item.roleName" :value="item.id" />
         </el-checkbox-group>
       </el-form-item>
     </el-form>

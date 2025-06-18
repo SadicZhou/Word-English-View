@@ -80,7 +80,7 @@
       </el-form-item>
 
       <!-- 菜单类型选择 - 只在新增时显示 -->
-      <el-form-item label="菜单类型" prop="menuType" v-bind="{ ...formItemConfig }"
+      <el-form-item label="菜单类型" prop="type" v-bind="{ ...formItemConfig }"
         v-if="title === '新增菜单' || title === '添加子菜单'">
         <el-radio-group v-model="menu.type">
           <el-radio label="1">菜单</el-radio>
@@ -223,7 +223,7 @@ const formRules = {
   status: [
     { required: true, message: '请选择状态', trigger: 'change' }
   ],
-  menuType: [
+  type: [
     { required: true, message: '请选择菜单类型', trigger: 'change' }
   ]
 };

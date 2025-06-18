@@ -2,46 +2,36 @@
     <div class="content">
         <!-- 搜索区域 -->
         <el-card :body-style="cardPad" class="search-card">
-            <el-row>
-                <div class="keyword">课程类型</div>
-                <el-col :span="4">
-                    <el-select v-model="queryParams.courseType" style="width: 95%" placeholder="请选择课程类型" clearable>
+            <el-form :model="queryParams" :inline="true" label-width="100px">
+                <el-form-item label="课程类型">
+                    <el-select v-model="queryParams.courseType" style="width: 200px" placeholder="请选择课程类型" clearable>
                         <el-option label="全部" value="" />
                         <el-option label="雅思" value="雅思" />
                         <el-option label="商务英语" value="商务英语" />
                     </el-select>
-                </el-col>
-                <div class="keyword">授课老师</div>
-                <el-col :span="4">
-                    <el-input v-model="queryParams.teacher" style="width: 95%" placeholder="请输入授课老师" clearable />
-                </el-col>
-                <div class="keyword">状态</div>
-                <el-col :span="4">
-                    <el-select v-model="queryParams.status" style="width: 95%" placeholder="请选择状态" clearable>
+                </el-form-item>
+                <el-form-item label="授课老师">
+                    <el-input v-model="queryParams.teacher" style="width: 200px" placeholder="请输入授课老师" clearable />
+                </el-form-item>
+                <el-form-item label="状态">
+                    <el-select v-model="queryParams.status" style="width: 200px" placeholder="请选择状态" clearable>
                         <el-option label="全部" value="" />
                         <el-option label="待审核" value="待审核" />
                         <el-option label="已驳回" value="已驳回" />
                         <el-option label="已取消" value="已取消" />
                         <el-option label="已通过" value="已通过" />
                     </el-select>
-                </el-col>
-            </el-row>
-            <el-row>
-                <div class="keyword">创建时间</div>
-                <el-col :span="8">
-                    <el-date-picker v-model="queryParams.createTime" style="width: 97.5%" type="daterange"
+                </el-form-item>
+                <el-form-item label="创建时间">
+                    <el-date-picker v-model="queryParams.createTime" style="width: 300px" type="daterange"
                         range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" format="YYYY-MM-DD"
                         value-format="YYYY-MM-DD" />
-                </el-col>
-            </el-row>
-            <el-row class="search-buttons">
-                <el-col :span="24">
-                    <div class="button-container">
-                        <el-button type="primary" :icon="Search" @click="handleQuery">查询</el-button>
-                        <el-button :icon="Refresh" @click="handleReset">重置</el-button>
-                    </div>
-                </el-col>
-            </el-row>
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" :icon="Search" @click="handleQuery">查询</el-button>
+                    <el-button :icon="Refresh" @click="handleReset">重置</el-button>
+                </el-form-item>
+            </el-form>
         </el-card>
 
         <!-- 操作区域 -->
@@ -76,6 +66,10 @@
                         <el-button link type="primary" size="small" @click="handleDetail(row)">
                             详情
                         </el-button>
+                        <el-button v-if="row.status === '待审核'" link type="success" size="small"
+                            @click="handleApproval(row)">
+                            审核
+                        </el-button>
                         <el-button v-if="row.status === '待审核'" link type="warning" size="small"
                             @click="handleWithdraw(row)">
                             撤回
@@ -96,6 +90,59 @@
                 @size-change="handleSizeChange" @current-change="handleCurrentChange" />
         </div>
     </div>
+
+    <!-- 课程审核对话框 -->
+    <el-dialog v-model="approvalDialogShow" width="800" title="课程审核" destroy-on-close>
+        <div class="approval-content">
+            <!-- 基础信息 -->
+            <div class="approval-section">
+                <h3 class="section-title">基础信息</h3>
+                <el-descriptions :column="2" border>
+                    <el-descriptions-item label="课程ID">{{ approvalData.id }}</el-descriptions-item>
+                    <el-descriptions-item label="课程名称">{{ approvalData.courseName }}</el-descriptions-item>
+                    <el-descriptions-item label="课程类型">{{ approvalData.courseType }}</el-descriptions-item>
+                    <el-descriptions-item label="授课老师">{{ approvalData.teacher }}</el-descriptions-item>
+                    <el-descriptions-item label="教室地点">{{ approvalData.classroom }}</el-descriptions-item>
+                    <el-descriptions-item label="上课时间">{{ approvalData.classTime }}</el-descriptions-item>
+                    <el-descriptions-item label="创建人">{{ approvalData.creator }}</el-descriptions-item>
+                    <el-descriptions-item label="创建时间">{{ approvalData.createTime }}</el-descriptions-item>
+                </el-descriptions>
+
+                <!-- 课程大纲 -->
+                <div class="syllabus-section" style="margin-top: 20px;">
+                    <h4>课程大纲：</h4>
+                    <div class="syllabus-preview">
+                        <el-image v-if="approvalData.syllabusUrl" :src="approvalData.syllabusUrl" alt="课程大纲"
+                            style="width: 200px; height: 150px" fit="cover"
+                            :preview-src-list="[approvalData.syllabusUrl]" preview-teleported />
+                        <span v-else>暂无课程大纲</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 审核信息 -->
+            <div class="approval-section" style="margin-top: 30px;">
+                <h3 class="section-title">审核信息</h3>
+                <el-form :model="approvalForm" :rules="approvalRules" ref="approvalFormRef" label-width="100px">
+                    <el-form-item label="审核结果" prop="result">
+                        <el-radio-group v-model="approvalForm.result">
+                            <el-radio label="pass">通过</el-radio>
+                            <el-radio label="reject">驳回</el-radio>
+                        </el-radio-group>
+                    </el-form-item>
+                    <el-form-item label="审核意见" prop="comment">
+                        <el-input v-model="approvalForm.comment" type="textarea" :rows="4" placeholder="请输入审核意见" />
+                    </el-form-item>
+                </el-form>
+            </div>
+        </div>
+        <template #footer>
+            <div class="dialog-footer">
+                <el-button @click="cancelApproval">取消</el-button>
+                <el-button type="primary" @click="confirmApproval">提交</el-button>
+            </div>
+        </template>
+    </el-dialog>
 
     <!-- 新建/编辑课程对话框 -->
     <el-dialog v-model="dialogShow" width="800" :title="title" destroy-on-close>
@@ -236,6 +283,7 @@ defineOptions({
 const loading = ref(false)
 const dialogShow = ref(false)
 const detailDialogShow = ref(false)
+const approvalDialogShow = ref(false)
 const title = ref('')
 
 // 查询参数
@@ -269,6 +317,20 @@ const formRules = {
 
 // 详情数据
 const detailData = ref<any>({})
+
+// 审核相关数据
+const approvalData = ref<any>({})
+const approvalFormRef = ref()
+const approvalForm = reactive({
+    result: '',
+    comment: ''
+})
+
+// 审核表单验证规则
+const approvalRules = {
+    result: [{ required: true, message: '请选择审核结果', trigger: 'change' }],
+    comment: [{ required: true, message: '请输入审核意见', trigger: 'blur' }]
+}
 
 // 表格数据
 const tableData = ref([
@@ -449,6 +511,50 @@ const handleResubmit = async (row: any) => {
 }
 
 /**
+ * 审核
+ */
+const handleApproval = (row: any) => {
+    approvalData.value = {
+        ...row,
+        syllabusUrl: 'https://via.placeholder.com/400x300/409EFF/fff?text=课程大纲' // 示例图片
+    }
+    // 重置审核表单
+    approvalForm.result = ''
+    approvalForm.comment = ''
+    approvalDialogShow.value = true
+}
+
+/**
+ * 取消审核
+ */
+const cancelApproval = () => {
+    approvalFormRef.value?.resetFields()
+    approvalDialogShow.value = false
+}
+
+/**
+ * 确认审核
+ */
+const confirmApproval = async () => {
+    try {
+        await approvalFormRef.value.validate()
+        loading.value = true
+
+        // 模拟API调用
+        setTimeout(() => {
+            loading.value = false
+            approvalDialogShow.value = false
+
+            const resultText = approvalForm.result === 'pass' ? '通过' : '驳回'
+            ElMessage.success(`课程"${approvalData.value.courseName}"审核${resultText}成功`)
+            handleQuery()
+        }, 1000)
+    } catch (error) {
+        console.error('审核表单验证失败:', error)
+    }
+}
+
+/**
  * 分页大小改变
  */
 const handleSizeChange = (val: number) => {
@@ -548,14 +654,39 @@ onMounted(() => {
     .search-card {
         margin-bottom: 20px;
 
-        .keyword {
-            font-weight: bold;
-            font-size: 15px;
-            color: #909399;
+        .keywords-col {
             display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 0 10px;
+            flex-direction: column;
+            justify-content: flex-start;
+            padding-right: 20px;
+
+            .keyword {
+                font-weight: bold;
+                font-size: 15px;
+                color: #909399;
+                height: 32px;
+                display: flex;
+                align-items: center;
+                justify-content: flex-end;
+                margin-bottom: 15px;
+                white-space: nowrap;
+
+                &:last-child {
+                    margin-bottom: 0;
+                }
+            }
+        }
+
+        .inputs-col {
+            .el-row {
+                .el-col {
+                    margin-bottom: 15px;
+
+                    &:nth-child(4) {
+                        margin-bottom: 0;
+                    }
+                }
+            }
         }
 
         // 按钮容器样式
@@ -584,6 +715,33 @@ onMounted(() => {
     }
 }
 
+// 审核内容样式
+.approval-content {
+    .approval-section {
+        .section-title {
+            margin-bottom: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #262626;
+            border-bottom: 1px solid #e8e8e8;
+            padding-bottom: 8px;
+        }
+
+        .syllabus-section {
+            h4 {
+                margin-bottom: 12px;
+                font-size: 14px;
+                font-weight: 600;
+            }
+
+            .syllabus-preview {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+            }
+        }
+    }
+}
 // 详情内容样式
 .detail-content {
     .detail-section {

@@ -24,6 +24,12 @@ export const userList = (data: SYSTEM.userPageParams) => {
     return httpRequst<SYSTEM.pageResponse<SYSTEM.user>>({ method: 'POST', url: `${BASE_URL_USER}/list/${data.current}/${data.limit}`, data: { ...data } })
 }
 /**
+ * 用户信息
+ */
+export const userInfo = () => {
+    return httpRequst<SYSTEM.user>({ method: 'GET', url: `${BASE_URL_INDEX}/getUserInfo` })
+}
+/**
  * 修改用户
  */
 export const updateSysUser = (data: SYSTEM.user) => {

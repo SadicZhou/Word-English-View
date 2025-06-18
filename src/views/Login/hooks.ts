@@ -1,11 +1,13 @@
 import { ElMessage } from 'element-plus';
-import { login } from "@/service/user"
+import { login, userInfo } from "@/service/user"
 import { useRouter } from "vue-router";
 import { usePermissonStore } from '@/store/permission';
+import { useUserStore } from '@/store/user';
 import { Ref } from 'vue';
 
 export function useLogin() {
     const permissionStore = usePermissonStore();
+    const userStore = useUserStore();
     const router = useRouter()
 
     const onSubmit = async (form: LOGIN.loginParams, saving: Ref<boolean>) => {
@@ -26,6 +28,21 @@ export function useLogin() {
 
                 // 强制清理所有缓存，确保重新获取最新路由
                 permissionStore.clearCache();
+
+                try {
+                    // 获取用户信息
+                    console.log('获取用户信息...');
+                    const userInfoRes = await userInfo();
+                    if (userInfoRes.code === 200) {
+                        // 存储用户信息到store和缓存
+                        userStore.setUserInfo(userInfoRes.data);
+                        console.log('用户信息获取成功:', userInfoRes.data);
+                    } else {
+                        console.warn('获取用户信息失败:', userInfoRes.message);
+                    }
+                } catch (error) {
+                    console.error('获取用户信息异常:', error);
+                }
 
                 // 强制重新获取路由数据（不使用任何缓存）
                 console.log('登录成功，强制重新获取最新路由...');

@@ -2,48 +2,30 @@
   <div class="content">
     <!-- 搜索区域 -->
     <el-card :body-style="cardPad" class="search-card">
-      <el-row>
-        <div class="keyword">关键字</div>
-        <el-col :span="4">
-          <el-input
-            v-model="searchForm.roleName"
-            style="width: 95%"
-            placeholder="请输入角色名"
-            :prefix-icon="Search"
-          />
-        </el-col>
-      </el-row>
-      <el-row class="search-buttons">
-        <el-col :span="24">
-          <div class="button-container">
-            <el-button
-              type="primary"
-              :icon="Search"
-              @click="getRoleList()"
-            >搜索</el-button>
-            <el-button :icon="Refresh" @click="resetSearch">重置</el-button>
-          </div>
-        </el-col>
-      </el-row>
+      <el-form :model="searchForm" :inline="true" label-width="100px">
+        <el-form-item label="角色名">
+          <el-input v-model="searchForm.roleName" style="width: 200px" placeholder="请输入角色名" :prefix-icon="Search" />
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" :icon="Search" @click="getRoleList()">搜索</el-button>
+          <el-button :icon="Refresh" @click="resetSearch">重置</el-button>
+        </el-form-item>
+      </el-form>
     </el-card>
-    
+
     <!-- 操作区域 -->
     <el-card :body-style="cardPad" class="action-card">
       <el-row>
         <el-col :span="24">
           <el-button type="primary" :icon="Plus" @click="addClick">新增角色</el-button>
-        
+
         </el-col>
       </el-row>
     </el-card>
-    
+
     <!-- 表格区域 -->
     <div class="table-container">
-      <el-table 
-        :data="tableData" 
-        v-bind="{ ...tableConfig }"
-        v-loading="loading"
-      >
+      <el-table :data="tableData" v-bind="{ ...tableConfig }" v-loading="loading">
         <el-table-column type="selection" width="55" />
         <el-table-column prop="id" label="ID" width="80" />
         <el-table-column prop="roleName" label="角色名" />
@@ -51,48 +33,24 @@
         <el-table-column prop="description" label="描述" show-overflow-tooltip />
         <el-table-column fixed="right" label="操作" width="220" align="center">
           <template #default="{ row }">
-            <el-button
-              link
-              type="primary"
-              size="small"
-              @click="updateClick(row)"
-            >
+            <el-button link type="primary" size="small" @click="updateClick(row)">
               修改
             </el-button>
-            <el-button
-              link
-              type="danger"
-              size="small"
-              @click="deleteClick(row)"
-              >删除</el-button
-            >
-            <el-button
-              link
-              type="success"
-              size="small"
-              @click="assignMenu(row)"
-              >分配菜单</el-button
-            >
+            <el-button link type="danger" size="small" @click="deleteClick(row)">删除</el-button>
+            <el-button link type="success" size="small" @click="assignMenu(row)">分配菜单</el-button>
           </template>
         </el-table-column>
       </el-table>
     </div>
-    
+
     <!-- 分页区域 -->
     <div class="pagination-container">
-      <el-pagination
-        background
-        layout="total, sizes, prev, pager, next, jumper"
-        :total="totalNum"
-        :page-sizes="[10, 20, 50, 100]"
-        v-model:current-page="current"
-        v-model:page-size="pageSize"
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-      />
+      <el-pagination background layout="total, sizes, prev, pager, next, jumper" :total="totalNum"
+        :page-sizes="[10, 20, 50, 100]" v-model:current-page="current" v-model:page-size="pageSize"
+        @size-change="handleSizeChange" @current-change="handleCurrentChange" />
     </div>
   </div>
-  
+
   <!-- 新增/修改角色对话框 -->
   <el-dialog v-model="dialogShow" width="500" :title="title" destroy-on-close>
     <el-form :model="role" v-bind="{ ...formConfig }">
@@ -103,12 +61,7 @@
         <el-input v-model="role.roleCode" autocomplete="off" />
       </el-form-item>
       <el-form-item label="描述" v-bind="{ ...formItemConfig }">
-        <el-input
-          v-model="role.description"
-          autocomplete="off"
-          :rows="2"
-          type="textarea"
-        />
+        <el-input v-model="role.description" autocomplete="off" :rows="2" type="textarea" />
       </el-form-item>
     </el-form>
     <template #footer>
@@ -118,22 +71,14 @@
       </div>
     </template>
   </el-dialog>
-  
+
   <!-- 分配菜单对话框 -->
   <el-dialog v-model="assiginMenuDialog" width="500">
     <template #header>
       <div class="titStyle">{{ title }}</div>
     </template>
-    <el-tree
-      style="max-width: 600px"
-      :data="menuList"
-      :props="defaultProps"
-      node-key="id"
-      :default-checked-keys="roleMenuIds"
-      :default-expand-all="true"
-      @check="handleMenuNodeClick"
-      show-checkbox
-    />
+    <el-tree style="max-width: 600px" :data="menuList" :props="defaultProps" node-key="id"
+      :default-checked-keys="roleMenuIds" :default-expand-all="true" @check="handleMenuNodeClick" show-checkbox />
     <template #footer>
       <div>
         <el-button @click="assginMenuCancelHandler">取消</el-button>
