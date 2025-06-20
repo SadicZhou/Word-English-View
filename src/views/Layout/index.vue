@@ -2,26 +2,46 @@
   <!-- 加载进度条 -->
   <LoadingBar ref="loadingBarRef" />
 
-  <div class="layout" :class="[
-  themeStore.menuTheme === 'light' ? 'light-menu' : 'dark-menu',
-  themeStore.compactMenu ? 'compact-menu' : '',
-]">
+  <div
+    class="layout"
+    :class="[
+      themeStore.menuTheme === 'light' ? 'light-menu' : 'dark-menu',
+      themeStore.compactMenu ? 'compact-menu' : '',
+    ]"
+  >
     <!-- 左侧菜单 -->
     <div class="menus" :class="{ 'is-collapsed': isCollapse }">
       <!-- Logo 区域 -->
-      <div class="tech-logo" :class="{ 'light-logo': themeStore.menuTheme === 'light' }">
+      <div
+        class="tech-logo"
+        :class="{ 'light-logo': themeStore.menuTheme === 'light' }"
+      >
         <div class="logo-text" v-if="!isCollapse">管理系统</div>
         <div class="logo-icon" v-else>系</div>
       </div>
 
       <!-- 菜单 -->
-      <el-menu :active-text-color="themeStore.menuTheme === 'dark' ? '#fff' : themeStore.themeColor
-        " :background-color="themeStore.menuTheme === 'dark' ? '#001529' : '#fff'" :text-color="themeStore.menuTheme === 'dark' ? 'rgba(255, 255, 255, 0.65)' : '#333'
-          " :default-active="activeMenu" class="el-menu-vertical-demo" :collapse="isCollapse" router>
+      <el-menu
+        :active-text-color="
+          themeStore.menuTheme === 'dark' ? '#fff' : themeStore.themeColor
+        "
+        :background-color="themeStore.menuTheme === 'dark' ? '#001529' : '#fff'"
+        :text-color="
+          themeStore.menuTheme === 'dark' ? 'rgba(255, 255, 255, 0.65)' : '#333'
+        "
+        :default-active="activeMenu"
+        class="el-menu-vertical-demo"
+        :collapse="isCollapse"
+        :unique-opened="false"
+        router
+      >
         <!-- 动态生成菜单 -->
         <template v-for="menu in menuList" :key="menu.id || menu.path">
           <!-- 有子菜单的情况 -->
-          <el-sub-menu v-if="menu.children && menu.children.length > 0" :index="menu.path || String(menu.id)">
+          <el-sub-menu
+            v-if="menu.children && menu.children.length > 0"
+            :index="getUniqueIndex(menu)"
+          >
             <template #title>
               <el-icon>
                 <component :is="getMenuIcon(menu.icon)" />
@@ -30,10 +50,15 @@
             </template>
 
             <!-- 递归渲染子菜单 -->
-            <template v-for="subMenu in menu.children" :key="subMenu.id || subMenu.path">
+            <template
+              v-for="subMenu in menu.children"
+              :key="subMenu.id || subMenu.path"
+            >
               <!-- 子菜单还有子菜单 -->
-              <el-sub-menu v-if="subMenu.children && subMenu.children.length > 0"
-                :index="subMenu.path || String(subMenu.id)">
+              <el-sub-menu
+                v-if="subMenu.children && subMenu.children.length > 0"
+                :index="getUniqueIndex(subMenu)"
+              >
                 <template #title>
                   <el-icon>
                     <component :is="getMenuIcon(subMenu.icon)" />
@@ -41,7 +66,11 @@
                   <span>{{ subMenu.title }}</span>
                 </template>
 
-                <el-menu-item v-for="item in subMenu.children" :key="item.id || item.path" :index="item.path">
+                <el-menu-item
+                  v-for="item in subMenu.children"
+                  :key="item.id || item.path"
+                  :index="getUniqueIndex(item)"
+                >
                   <el-icon>
                     <component :is="getMenuIcon(item.icon)" />
                   </el-icon>
@@ -50,7 +79,7 @@
               </el-sub-menu>
 
               <!-- 子菜单没有子菜单 -->
-              <el-menu-item v-else :index="subMenu.path">
+              <el-menu-item v-else :index="getUniqueIndex(subMenu)">
                 <el-icon>
                   <component :is="getMenuIcon(subMenu.icon)" />
                 </el-icon>
@@ -60,7 +89,7 @@
           </el-sub-menu>
 
           <!-- 没有子菜单的情况 -->
-          <el-menu-item v-else :index="menu.path">
+          <el-menu-item v-else :index="getUniqueIndex(menu)">
             <el-icon>
               <component :is="getMenuIcon(menu.icon)" />
             </el-icon>
@@ -73,12 +102,20 @@
     <div class="content">
       <el-card>
         <div class="content_top">
-          <img @click="toggleCollapse" class="control" :src="isCollapse ? open : close" alt="" />
+          <img
+            @click="toggleCollapse"
+            class="control"
+            :src="isCollapse ? open : close"
+            alt=""
+          />
           <div class="content_top_right">
             <!-- 面包屑导航 -->
             <el-breadcrumb separator="/">
               <!-- <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item> -->
-              <el-breadcrumb-item v-for="(item, index) in breadcrumbList" :key="index">
+              <el-breadcrumb-item
+                v-for="(item, index) in breadcrumbList"
+                :key="index"
+              >
                 {{ item.title }}
               </el-breadcrumb-item>
             </el-breadcrumb>
@@ -96,7 +133,10 @@
           <!-- 用户信息 -->
           <el-dropdown trigger="click" @command="handleCommand">
             <span class="user-dropdown">
-              <el-avatar :size="32" src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png" />
+              <el-avatar
+                :size="32"
+                src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
+              />
               <span class="username">{{ userInfo.username || "管理员" }}</span>
             </span>
             <template #dropdown>
@@ -104,8 +144,12 @@
                 <el-dropdown-item command="profile">个人信息</el-dropdown-item>
                 <el-dropdown-item command="password">修改密码</el-dropdown-item>
                 <el-dropdown-item command="refresh">刷新页面</el-dropdown-item>
-                <el-dropdown-item command="refreshRoutes">刷新路由</el-dropdown-item>
-                <el-dropdown-item divided command="logout">退出登录</el-dropdown-item>
+                <el-dropdown-item command="refreshRoutes"
+                  >刷新路由</el-dropdown-item
+                >
+                <el-dropdown-item divided command="logout"
+                  >退出登录</el-dropdown-item
+                >
               </el-dropdown-menu>
             </template>
           </el-dropdown>
@@ -177,7 +221,7 @@ const loadingBarRef = ref();
 const isCollapse = ref(false);
 
 // 路由切换动画名称
-const transitionName = ref('fade-slide');
+const transitionName = ref("fade-slide");
 
 // 路由key，确保每次路由变化都重新渲染组件
 const routeKey = computed(() => {
@@ -264,6 +308,24 @@ const getMenuIcon = (iconName: string | undefined): any => {
 };
 
 /**
+ * 生成唯一的菜单索引
+ * @param {any} menu - 菜单项
+ * @returns {string} 唯一的索引值
+ */
+const getUniqueIndex = (menu: any): string => {
+  // 优先使用 path，这是最稳定的标识符
+  if (menu.path && menu.path.trim()) {
+    return menu.path;
+  }
+  // 其次使用 id
+  if (menu.id) {
+    return `menu_${menu.id}`;
+  }
+  // 最后使用 title 作为标识符，不使用时间戳和随机数
+  return `menu_${menu.title || "unknown"}`;
+};
+
+/**
  * 切换菜单折叠状态
  */
 const toggleCollapse = () => {
@@ -278,7 +340,7 @@ const toggleCollapse = () => {
  */
 const changeTransition = (animationType: string) => {
   transitionName.value = animationType;
-  localStorage.setItem('routeTransition', animationType);
+  localStorage.setItem("routeTransition", animationType);
 };
 
 /**
@@ -311,7 +373,7 @@ const handleCommand = async (command: string) => {
             ElMessage.success("退出登录成功");
           }, 100);
         } catch (error) {
-          console.error('退出登录失败:', error);
+          console.error("退出登录失败:", error);
           ElMessage.error("退出登录失败，请重试");
         }
       })
@@ -323,14 +385,14 @@ const handleCommand = async (command: string) => {
   } else if (command === "refresh") {
     // 刷新当前页面
     forceRefreshCurrentPage();
-    ElMessage.success('页面刷新成功');
+    ElMessage.success("页面刷新成功");
   } else if (command === "refreshRoutes") {
     // 刷新路由配置
     try {
       await permissionStore.refreshRoutes(true);
     } catch (error) {
-      console.error('刷新路由失败:', error);
-      ElMessage.error('刷新路由失败，请重试');
+      console.error("刷新路由失败:", error);
+      ElMessage.error("刷新路由失败，请重试");
     }
   }
 };
@@ -635,7 +697,8 @@ $mw: 200px;
     .content_btm {
       padding: 17px;
       box-sizing: border-box;
-      overflow: auto;
+      overflow-y: auto;
+      overflow-x: hidden;
       height: calc(100vh - 120px);
     }
   }
@@ -710,7 +773,7 @@ $mw: 200px;
 .content_btm {
   position: relative;
 
-  >* {
+  > * {
     width: 100%;
   }
 
