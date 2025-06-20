@@ -1,26 +1,30 @@
 .mt-10 {
-    margin: 10px 0px;
+margin: 10px 0px;
 }
 
 .conheight {
-    max-height: 95%;
+max-height: 95%;
     box-sizing: border-box;
     overflow: auto;
 }
 
 .page {
-    display: flex;
+display: flex;
     justify-content: flex-end;
     margin-top: 10px;
 }
 
 .titStyle {
-    font-weight: bolder;
+font-weight: bolder;
 }
 .content {
-    width: 98%;
+width: 98%;
     height: 80%;
 }
+// 分页容器样式
 .pagination-container {
-    margin-top: 20px;
+display: flex;
+    justify-content: center;
+    padding: 20px;
+    border-radius: 6px;
 }

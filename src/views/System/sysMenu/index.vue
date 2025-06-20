@@ -105,14 +105,7 @@
       </el-form-item>
 
       <el-form-item label="图标" v-bind="{ ...formItemConfig }">
-        <el-select v-model="menu.icon" placeholder="请选择图标（可选）" filterable clearable>
-          <el-option v-for="icon in iconList" :key="icon" :label="icon" :value="icon">
-            <div class="icon-option">
-              <component :is="getIconComponent(icon)" class="icon-display" />
-              <span class="icon-name">{{ icon }}</span>
-            </div>
-          </el-option>
-        </el-select>
+        <IconSelect v-model="menu.icon" width="500px" />
       </el-form-item>
 
       <el-form-item label="排序值" prop="sortValue" v-bind="{ ...formItemConfig }">
@@ -160,18 +153,15 @@ import { menuList } from "@/service/menu";
 import { HOOKS } from "@/hooks";
 import { usePermissonStore } from "@/store/permission";
 import { useRouter } from "vue-router";
+import IconSelect from "@/components/IconSelect/index.vue";
 
 // 获取 permission store 实例
 const permissionStore = usePermissonStore();
 const router = useRouter();
 
-// 图标列表 - 使用字符串名称而不是组件引用
-const iconList = [
-  'Search', 'Plus', 'Refresh', 'Setting', 'User', 'MenuIcon', 'Location', 'Document',
-  'Folder', 'Bell', 'Home', 'Star', 'Delete', 'Edit', 'Calendar', 'Camera', 'ChatLineRound',
-  'Check', 'CircleCheck', 'Close', 'Download', 'Upload', 'Warning', 'InfoFilled',
-  'SuccessFilled', 'QuestionFilled', 'ArrowDown', 'ArrowUp', 'ArrowLeft', 'ArrowRight'
-];
+// IconSelect 组件已自动导入，无需额外声明
+
+// 注意：现在使用 IconSelect 组件，iconList 已不再需要
 
 let dialogShow = ref(false);
 let currentPage = ref(1);
@@ -694,30 +684,7 @@ onMounted(() => {
   }
 }
 
-// 图标选择器样式
-.icon-option {
-  display: flex;
-  align-items: center;
-  padding: 8px 0;
-
-  .icon-display {
-    width: 32px;
-    height: 32px;
-    margin-right: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
-    color: #606266;
-    flex-shrink: 0; // 防止图标被压缩
-  }
-
-  .icon-name {
-    font-size: 14px;
-    color: #606266;
-    line-height: 1.4;
-  }
-}
+// 图标选择器样式已移至 IconSelect 组件中
 
 // 表格中图标显示样式
 :deep(.el-table) {
@@ -727,5 +694,12 @@ onMounted(() => {
     font-size: 18px;
     color: #606266;
   }
+}
+
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+  border-radius: 6px;
 }
 </style>
